@@ -63,12 +63,12 @@ bun run preview
 
 ```bash
 # Build Docker image
-docker build -t JS.GS .
+docker build -t js.gs .
 
 # Run container
 docker run -p 3000:3000 \
   --env-file .env \
-  JS.GS
+  js.gs
 ```
 
 ## Support & Community

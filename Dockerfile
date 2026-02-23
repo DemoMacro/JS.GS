@@ -1,12 +1,14 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:1 AS build
+# use the official Node image
+# see all versions at https://hub.docker.com/_/node/tags
+FROM node:24-slim AS build
+RUN corepack enable
 WORKDIR /app
 
-COPY package.json bun.lock* ./
+# Copy package.json and your lockfile, here we add pnpm-lock.yaml for illustration
+COPY package.json pnpm-lock.yaml .npmrc ./
 
 # use ignore-scripts to avoid running postinstall hooks
-RUN bun install --frozen-lockfile --ignore-scripts
+RUN pnpm install --frozen-lockfile
 
 # Copy the entire project
 COPY . .
@@ -15,13 +17,13 @@ COPY . .
 ENV NITRO_PRESET=node_cluster
 ENV NODE_ENV=production
 ENV SKIP_MIGRATE=true
-RUN bun --bun run build
+RUN pnpm run build
 
-# Bundle migrate script into .output/scripts directory
-RUN bun build ./scripts/migrate.ts --outfile ./.output/scripts/migrate.mjs --target=bun --minify
+# Bundle migrate script into .output/scripts directory using rolldown
+RUN pnpx rolldown --input ./scripts/migrate.ts --format esm --file ./.output/scripts/migrate.mjs --minify --platform node --inlineDynamicImports
 
 # copy production dependencies and source code into final image
-FROM oven/bun:1-alpine AS production
+FROM node:24-slim AS production
 WORKDIR /app
 
 # Copy .output directory (which now contains migrate.mjs)
@@ -34,4 +36,4 @@ ENV PORT=3000
 
 # run the app
 EXPOSE 3000/tcp
-ENTRYPOINT ["sh", "-c", "bun /app/scripts/migrate.mjs && bun --bun run /app/server/index.mjs"]
+ENTRYPOINT ["sh", "-c", "node /app/scripts/migrate.mjs && node /app/server/index.mjs"]
