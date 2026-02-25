@@ -1,0 +1,53 @@
+services:
+  app:
+    image: demomacro/js.gs:latest
+    container_name: js-gs-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Better Auth Configuration
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+
+      # Database Configuration
+      DATABASE_URL: ${DATABASE_URL}
+
+      # ClickHouse Configuration
+      CLICKHOUSE_URL: ${CLICKHOUSE_URL}
+      CLICKHOUSE_USERNAME: ${CLICKHOUSE_USERNAME}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DATABASE: ${CLICKHOUSE_DATABASE}
+
+      # Redis Configuration
+      REDIS_URL: ${REDIS_URL}
+
+      # Admin User Configuration
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_NAME: ${ADMIN_NAME}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+
+      # Resend Email Service
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL}
+
+      # Build Configuration
+      SKIP_MIGRATE: ${SKIP_MIGRATE:-false}
+
+      # Node Environment
+      NODE_ENV: production
+    networks:
+      - js-gs-network
+    healthcheck:
+      test:
+        ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  js-gs-network:
+    driver: bridge
+    name: js-gs-network

@@ -25,7 +25,8 @@ Complete API documentation is available at **https://js.gs/api/reference**
 
 ### Prerequisites
 
-- **Bun** runtime
+- **Node.js** 24+ (with TypeScript support)
+- **pnpm** package manager
 - **PostgreSQL** 14+ database
 - **ClickHouse** server for analytics storage
 - **Redis** (optional, for caching)
@@ -34,17 +35,17 @@ Complete API documentation is available at **https://js.gs/api/reference**
 
 ```bash
 # Install dependencies
-bun install
+pnpm install
 
 # Build the application
-bun run build
+pnpm run build
 ```
 
 ### Development
 
 ```bash
 # Start development server
-bun run dev
+pnpm run dev
 ```
 
 The application will be available at `http://localhost:3000`
@@ -53,21 +54,69 @@ The application will be available at `http://localhost:3000`
 
 ```bash
 # Build the application
-bun run build
+pnpm run build
 
 # Start production server
-bun run preview
+pnpm run preview
 ```
 
 #### Docker Deployment
+
+##### Option 1: Using Docker Compose (Recommended)
+
+```bash
+# Copy environment variables
+cp .env.example .env
+
+# Edit .env file to configure your database and services
+# nano .env
+
+# Start the application
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop the application
+docker-compose down
+```
+
+The application will be available at `http://localhost:3000`
+
+##### Option 2: Using Docker Run
+
+```bash
+# Pull the official image
+docker pull demomacro/js.gs:latest
+
+# Run container
+docker run -d \
+  --name js-gs \
+  -p 3000:3000 \
+  --env-file .env \
+  --restart unless-stopped \
+  demomacro/js.gs:latest
+
+# View logs
+docker logs -f js-gs
+
+# Stop the container
+docker stop js-gs
+docker rm js-gs
+```
+
+##### Option 3: Build from Source
 
 ```bash
 # Build Docker image
 docker build -t js.gs .
 
 # Run container
-docker run -p 3000:3000 \
+docker run -d \
+  --name js-gs \
+  -p 3000:3000 \
   --env-file .env \
+  --restart unless-stopped \
   js.gs
 ```
 
