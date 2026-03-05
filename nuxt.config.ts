@@ -1,11 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config";
-import { isDevelopment, env } from "std-env";
+import { isProduction, env } from "std-env";
 
 export default defineNuxtConfig({
-  app: {
-    keepalive: true,
-  },
-
   future: {
     compatibilityVersion: 5,
   },
@@ -13,7 +9,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2026-02-16",
 
   typescript: {
-    typeCheck: isDevelopment ? true : false,
+    typeCheck: !isProduction,
   },
 
   routeRules: {
@@ -42,6 +38,10 @@ export default defineNuxtConfig({
       deployConfig: true,
       nodeCompat: true,
     },
+    ...(isProduction && {
+      serveStatic: "inline",
+      noExternals: true,
+    }),
   },
 
   modules: ["@nuxt/ui", "@vueuse/nuxt", "@nuxtjs/i18n", "@nuxt/content"],

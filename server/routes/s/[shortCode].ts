@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Set link to cache with domainName
-    await setLink(shortCode, finalDomainName, linkData as Link);
+    await setLink(shortCode, finalDomainName, linkData);
 
     link = { ...linkData, domainName: finalDomainName };
   }

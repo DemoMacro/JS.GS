@@ -70,6 +70,7 @@ export const listEvents = () => {
 
       // Apply time range filters
       if (start) {
+        // @ts-expect-error - ClickHouse type complexity is too high for TypeScript inference
         query = query.where("timestamp", "gte", start);
       }
       if (end) {

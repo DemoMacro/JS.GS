@@ -1,5 +1,6 @@
 import { betterAuth, type BetterAuthOptions } from "better-auth";
-import { username, admin, apiKey, organization, openAPI } from "better-auth/plugins";
+import { username, admin, organization, openAPI } from "better-auth/plugins";
+import { apiKey } from "@better-auth/api-key";
 import { Pool } from "pg";
 import { link } from "../../../shared/utils/auth/link";
 import { domain } from "../../../shared/utils/auth/domain";
@@ -130,8 +131,12 @@ export const authConfig = {
   ],
   rateLimit: {
     enabled: true,
-    window: 60,
-    max: 100,
+    customRules: {
+      "/link/create": {
+        window: 60,
+        max: 100,
+      },
+    },
     storage: "secondary-storage",
   },
   user: {

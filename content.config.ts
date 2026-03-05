@@ -4,13 +4,17 @@ export default defineContentConfig({
   collections: {
     content_en: defineCollection({
       type: "page",
-      source: "en/*.md",
-      prefix: "/",
+      source: {
+        include: "en/*.md",
+        prefix: "/",
+      },
     }),
     content_zh_cn: defineCollection({
       type: "page",
-      source: "zh_cn/*.md",
-      prefix: "/",
+      source: {
+        include: "zh_cn/*.md",
+        prefix: "/",
+      },
     }),
   },
 });

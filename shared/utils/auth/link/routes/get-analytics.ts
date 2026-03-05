@@ -81,6 +81,7 @@ export const getAnalytics = () => {
       const buildBaseQuery = () => {
         let query = chdb.table("clickEvents").where("linkId", "eq", linkId);
         if (start) {
+          // @ts-ignore - ClickHouse type complexity is too high for TypeScript inference
           query = query.where("timestamp", "gte", start);
         }
         if (end) {
