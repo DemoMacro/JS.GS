@@ -2,22 +2,24 @@ import { Resend } from "resend";
 import { env } from "std-env";
 
 /**
- * Send email verification email using Resend
+ * Send email using Resend
  */
-export async function sendEmailVerification({
+export async function sendEmail({
   user,
-  url,
+  subject,
+  text,
 }: {
   user: { email: string; name?: string };
-  url: string;
+  subject: string;
+  text: string;
 }) {
   try {
     const resend = new Resend(env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: env.RESEND_FROM_EMAIL || "JS.GS <noreply@js.gs>",
       to: user.email,
-      subject: "Verify your JS.GS email address",
-      text: `Please click the following link to verify your email address:\n\n${url}\n\nIf you did not register for a JS.GS account, please ignore this email.\nThis link will expire in 1 hour.`,
+      subject,
+      text,
     });
 
     if (error) {
@@ -27,7 +29,7 @@ export async function sendEmailVerification({
 
     return { success: true, data };
   } catch (error) {
-    console.error("Failed to send verification email:", error);
+    console.error("Failed to send email:", error);
     throw error;
   }
 }

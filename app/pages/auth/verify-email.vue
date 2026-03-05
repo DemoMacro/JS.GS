@@ -75,7 +75,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       >
         <template #footer>
           <div class="text-center text-sm text-muted">
-            <p>Already verified?</p>
+            <span>Already verified?</span>
             <ULink to="/auth/sign-in" class="text-primary font-medium"> Sign In </ULink>
           </div>
         </template>

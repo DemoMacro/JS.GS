@@ -5,7 +5,7 @@ import { Pool } from "pg";
 import { link } from "../../../shared/utils/auth/link";
 import { domain } from "../../../shared/utils/auth/domain";
 import { env } from "std-env";
-import { sendEmailVerification } from "../email/resend";
+import { sendEmail } from "../email/resend";
 import { cacheStorage } from "../../../shared/utils/storage";
 import { toNumber, isValidIP } from "ipdo";
 import reservedUsernames from "reserved-usernames";
@@ -59,13 +59,23 @@ export const authConfig = {
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      // Use void to avoid blocking - recommended by better-auth to prevent timing attacks
+      void sendEmail({
+        user,
+        subject: "Reset Your Password",
+        text: `Please click the following link to reset your password:\n\n${url}\n\nIf you did not request a password reset, please ignore this email.\nThis link will expire in 1 hour.`,
+      });
+    },
+    resetPasswordTokenExpiresIn: 3600, // 1 hour
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       // Use void to avoid blocking - recommended by better-auth to prevent timing attacks
-      void sendEmailVerification({
+      void sendEmail({
         user,
-        url,
+        subject: "Verify your JS.GS email address",
+        text: `Please click the following link to verify your email address:\n\n${url}\n\nIf you did not register for a JS.GS account, please ignore this email.\nThis link will expire in 1 hour.`,
       });
     },
     sendOnSignUp: true,

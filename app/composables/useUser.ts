@@ -33,17 +33,8 @@ export const useUser = (userId: string) => {
   const updateUser = async (updates: UserUpdateData) => {
     if (!user.value) return;
 
-    // Update role
-    if (updates.role && updates.role !== user.value.role) {
-      const result = await authClient.admin.setRole({
-        userId: user.value.id,
-        role: updates.role as "user" | "admin", // 明确类型转换
-      });
-
-      if (result.error) {
-        throw new Error(result.error.message || "Failed to update role");
-      }
-    }
+    const allowedFields = ["email", "name", "image", "emailVerified", "banned", "banReason", "banExpires"] as const;
+    const hasOnlyPassword = Object.keys(updates).length === 1 && "newPassword" in updates;
 
     // Update password
     if (updates.newPassword) {
@@ -55,28 +46,33 @@ export const useUser = (userId: string) => {
       if (result.error) {
         throw new Error(result.error.message || "Failed to update password");
       }
+
+      // If only updating password, refresh and return early
+      if (hasOnlyPassword) {
+        await fetchUser();
+        return;
+      }
     }
 
-    // Use Better-Auth's updateUser API
-    const { email, name, image, emailVerified, banned, banReason, banExpires, ...otherData } =
-      updates;
-    const updateData = {
-      email,
-      name,
-      image,
-      emailVerified,
-      banned,
-      banReason,
-      banExpires,
-      ...otherData,
-    };
+    // Update role
+    if (updates.role && updates.role !== user.value.role) {
+      const result = await authClient.admin.setRole({
+        userId: user.value.id,
+        role: updates.role as "user" | "admin",
+      });
 
-    // Remove fields that shouldn't be updated via updateUser
-    delete updateData.role;
-    delete updateData.newPassword;
-    delete updateData.id;
-    delete updateData.createdAt;
-    delete updateData.updatedAt;
+      if (result.error) {
+        throw new Error(result.error.message || "Failed to update role");
+      }
+    }
+
+    // Build update data with only allowed fields
+    const updateData = allowedFields.reduce((acc, field) => {
+      if (updates[field] !== undefined) {
+        acc[field] = updates[field];
+      }
+      return acc;
+    }, {} as Record<string, unknown>);
 
     if (Object.keys(updateData).length > 0) {
       const result = await authClient.admin.updateUser({
