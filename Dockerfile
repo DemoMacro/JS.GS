@@ -21,7 +21,7 @@ RUN bun --bun run build
 RUN bun build ./scripts/migrate.ts --outfile ./.output/scripts/migrate.mjs --target=bun --minify
 
 # copy production dependencies and source code into final image
-FROM oven/bun:1-slim AS production
+FROM oven/bun:1-alpine AS production
 WORKDIR /app
 
 # Copy .output directory (which now contains migrate.mjs)
