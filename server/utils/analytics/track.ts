@@ -93,15 +93,18 @@ function cleanReferrer(referrer: string): string {
  */
 export async function trackClickEvent(event: H3Event, link: Link): Promise<void> {
   try {
-    const ip = anonymizeIP(getClientIP(event));
+    const rawIp = getClientIP(event);
     const userAgent = getHeader(event, "user-agent") ?? "";
     const referrer = cleanReferrer(getHeader(event, "referer") ?? "");
 
     // Parse User-Agent
     const ua = UAParser(userAgent);
 
-    // Query GeoIP
-    const geo: GeoLocation | null = await geoip.lookup(ip);
+    // Query GeoIP with original IP for accuracy
+    const geo: GeoLocation | null = await geoip.lookup(rawIp);
+
+    // Anonymize IP for storage (privacy)
+    const ip = anonymizeIP(rawIp);
 
     // Extract query parameters
     const queryParams: Record<string, string> = {};
