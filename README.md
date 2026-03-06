@@ -25,8 +25,7 @@ Complete API documentation is available at **https://js.gs/api/reference**
 
 ### Prerequisites
 
-- **Node.js** 24+ (with TypeScript support)
-- **pnpm** package manager
+- **Bun** runtime and package manager
 - **PostgreSQL** 14+ database
 - **ClickHouse** server for analytics storage
 - **Redis** (optional, for caching)
@@ -35,17 +34,17 @@ Complete API documentation is available at **https://js.gs/api/reference**
 
 ```bash
 # Install dependencies
-pnpm install
+bun install
 
 # Build the application
-pnpm run build
+bun run build
 ```
 
 ### Development
 
 ```bash
 # Start development server
-pnpm run dev
+bun run dev
 ```
 
 The application will be available at `http://localhost:3000`
@@ -54,10 +53,10 @@ The application will be available at `http://localhost:3000`
 
 ```bash
 # Build the application
-pnpm run build
+bun run build
 
 # Start production server
-pnpm run preview
+bun run preview
 ```
 
 #### Docker Deployment

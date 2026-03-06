@@ -33,7 +33,15 @@ export const useUser = (userId: string) => {
   const updateUser = async (updates: UserUpdateData) => {
     if (!user.value) return;
 
-    const allowedFields = ["email", "name", "image", "emailVerified", "banned", "banReason", "banExpires"] as const;
+    const allowedFields = [
+      "email",
+      "name",
+      "image",
+      "emailVerified",
+      "banned",
+      "banReason",
+      "banExpires",
+    ] as const;
     const hasOnlyPassword = Object.keys(updates).length === 1 && "newPassword" in updates;
 
     // Update password
@@ -67,12 +75,15 @@ export const useUser = (userId: string) => {
     }
 
     // Build update data with only allowed fields
-    const updateData = allowedFields.reduce((acc, field) => {
-      if (updates[field] !== undefined) {
-        acc[field] = updates[field];
-      }
-      return acc;
-    }, {} as Record<string, unknown>);
+    const updateData = allowedFields.reduce(
+      (acc, field) => {
+        if (updates[field] !== undefined) {
+          acc[field] = updates[field];
+        }
+        return acc;
+      },
+      {} as Record<string, unknown>,
+    );
 
     if (Object.keys(updateData).length > 0) {
       const result = await authClient.admin.updateUser({

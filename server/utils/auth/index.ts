@@ -46,6 +46,7 @@ function normalizeKey(key: string): string {
 
 export const authConfig = {
   basePath: "/api",
+  baseURL: env.BETTER_AUTH_URL,
   database: new Pool({
     // connection options
     connectionString: env.DATABASE_URL,
@@ -54,6 +55,26 @@ export const authConfig = {
     database: {
       generateId: "uuid",
     },
+    // Configure IP address detection for rate limiting
+    // This aligns with the IP detection logic in server/utils/analytics/track.ts
+    ipAddress: {
+      ipAddressHeaders: [
+        // Most reliable - Cloudflare Enterprise
+        "true-client-ip",
+        // Platform-specific headers
+        "cf-connecting-ip", // Cloudflare
+        "x-vercel-forwarded-for", // Vercel
+        "fly-client-ip", // Fly.io
+        "fastly-client-ip", // Fastly
+        // Generic headers
+        "x-forwarded-for", // Standard proxy/load balancer
+        "x-real-ip", // Nginx/Apache
+        "x-client-ip", // Some proxies
+      ],
+    },
+    // Trust proxy headers for correct base URL inference
+    // Enable this when deploying behind reverse proxies (Cloudflare, Nginx, etc.)
+    trustedProxyHeaders: true,
   },
   experimental: { joins: true },
   emailAndPassword: {
