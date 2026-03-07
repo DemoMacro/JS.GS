@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
 import { chdb } from "../../../../../server/utils/database";
-import { toStartOfInterval } from "@hypequery/clickhouse";
+import { toStartOfInterval, rawAs } from "@hypequery/clickhouse";
 
 // GroupBy options matching Dub.co API
 const AnalyticsGroupBySchema = z.enum([
@@ -39,7 +39,8 @@ export const getAnalytics = () => {
       use: [sessionMiddleware],
       metadata: {
         openapi: {
-          description: "Retrieve analytics for a link",
+          description:
+            "Retrieve analytics for a link. Unique visitors are calculated using a privacy-compliant 'soft fingerprint' combining anonymized IP, browser version, OS version, device vendor, and model. This provides better accuracy than IP-only counting while remaining GDPR compliant.",
           responses: {
             "200": {
               description: "Analytics retrieved successfully",
@@ -93,9 +94,25 @@ export const getAnalytics = () => {
       // Execute query based on groupBy
       switch (groupBy) {
         case "count": {
-          const result = await buildBaseQuery().count("id", "totalClicks").execute();
+          const countResult = await buildBaseQuery().count("id", "totalClicks").execute();
+
+          // Query unique visitors using "soft fingerprint" combination
+          // Combines: ip (anonymized) + browserMajor + osVersion + deviceVendor + deviceModel
+          // This provides better accuracy than IP alone while remaining GDPR compliant
+          const uniqueResult = await buildBaseQuery()
+            .select([
+              rawAs(
+                "uniqExact(concat(ip, '|', browserMajor, '|', osVersion, '|', deviceVendor, '|', deviceModel))",
+                "uniqueVisitors"
+              ),
+            ])
+            .execute();
+
           return ctx.json({
-            totalClicks: result[0]?.totalClicks ?? 0,
+            totalClicks: countResult[0]?.totalClicks ?? 0,
+            uniqueVisitors: uniqueResult[0]?.uniqueVisitors
+              ? Number(uniqueResult[0].uniqueVisitors)
+              : 0,
           });
         }
 

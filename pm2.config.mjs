@@ -1,7 +1,7 @@
 export const apps = [
   {
     name: "JS.GS",
-    script: "node",
-    args: "--env-file=.env .output/server/index.mjs",
+    script: "bun",
+    args: "--bun run .output/server/index.mjs",
   },
 ];

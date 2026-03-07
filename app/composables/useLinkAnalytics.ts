@@ -102,6 +102,13 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
         );
       }
 
+      // Handle unique visitors from count result
+      if (countResult.data && "uniqueVisitors" in countResult.data) {
+        uniqueVisitors.value = Number(
+          (countResult.data as { uniqueVisitors: string | number }).uniqueVisitors,
+        );
+      }
+
       // Handle timeseries
       if (timeseriesResult.data && "data" in timeseriesResult.data) {
         timeseries.value = (timeseriesResult.data as { data: TimeseriesData[] }).data;
@@ -136,10 +143,6 @@ export function useLinkAnalytics(linkId: string, externalRange?: Ref<Range>) {
       if (utmSourcesResult.data && "data" in utmSourcesResult.data) {
         utmSources.value = (utmSourcesResult.data as { data: DimensionData[] }).data;
       }
-
-      // Calculate unique visitors (approximate)
-      // Proper implementation needs DISTINCT query, using estimate for now
-      uniqueVisitors.value = Math.floor(totalClicks.value * 0.7);
     } catch (e) {
       error.value = e instanceof Error ? e.message : "Failed to fetch analytics";
     } finally {

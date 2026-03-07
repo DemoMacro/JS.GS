@@ -63,15 +63,62 @@ export function getClientIP(event: H3Event): string {
 }
 
 /**
- * Anonymize IP address by removing the last octet
+ * Anonymize IP address for privacy compliance
+ * - IPv4: Replace last octet with 0 (e.g., 192.168.1.100 -> 192.168.1.0)
+ * - IPv6: Use /64 prefix mask (e.g., 2001:0db8:85a3::8a2e:0370:7334 -> 2001:db8:85a3::)
  */
 function anonymizeIP(ip: string): string {
-  const parts = ip.split(".");
-  if (parts.length === 4) {
-    parts[3] = "0";
-    return parts.join(".");
+  // IPv4 anonymization - replace last octet
+  const ipv4Parts = ip.split(".");
+  if (ipv4Parts.length === 4) {
+    ipv4Parts[3] = "0";
+    return ipv4Parts.join(".");
   }
-  // For IPv6 or other formats, return as-is
+
+  // IPv6 anonymization - use /64 prefix
+  if (ip.includes(":")) {
+    try {
+      // Split IPv6 address by ::
+      const parts = ip.split("::");
+
+      if (parts.length === 2) {
+        // Compressed IPv6 format (contains ::)
+        const prefix = parts[0];
+
+        // Handle case where prefix might be undefined or empty
+        if (!prefix) {
+          // If prefix is empty, the IPv6 starts with ::, return :: (anycast)
+          return "::";
+        }
+
+        const segments = prefix.split(":");
+
+        // Keep first 4 segments (64 bits) for /64 prefix
+        if (segments.length >= 4) {
+          const prefix64 = segments.slice(0, 4).join(":");
+          return `${prefix64}::`;
+        }
+        return `${prefix}::`;
+      } else {
+        // Full IPv6 format
+        const segments = ip.split(":");
+        if (segments.length >= 8) {
+          // Keep first 4 segments (64 bits) for /64 prefix
+          const prefix64 = segments.slice(0, 4).join(":");
+          return `${prefix64}::`;
+        } else if (segments.length >= 4) {
+          // Keep first 4 segments
+          const prefix64 = segments.slice(0, 4).join(":");
+          return `${prefix64}::`;
+        }
+      }
+    } catch {
+      // If parsing fails, return original IP (fallback)
+      console.warn("Failed to anonymize IPv6 address:", ip);
+    }
+  }
+
+  // Fallback: return original IP if anonymization fails
   return ip;
 }
 

@@ -22,6 +22,13 @@ const items = computed<NavigationMenuItem[]>(() => {
       active: route.path.startsWith("/dashboard"),
       icon: "i-lucide-layout-dashboard",
     },
+    {
+      label: "API Reference",
+      to: "/api/reference",
+      active: route.path === "/api/reference",
+      icon: "i-lucide-code",
+      target: "_blank",
+    },
   ];
 
   return baseItems;
