@@ -23,7 +23,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "lint": "basis lint",
-    "db": "bun scripts/migrate.ts",
+    "db": "node scripts/migrate.ts",
     "postinstall": "nuxt prepare && basis git setup"
   },
   "devDependencies": {

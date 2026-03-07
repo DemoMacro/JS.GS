@@ -38,10 +38,6 @@ export default defineNuxtConfig({
       deployConfig: true,
       nodeCompat: true,
     },
-    ...(isProduction && {
-      serveStatic: "inline",
-      noExternals: true,
-    }),
   },
 
   modules: ["@nuxt/ui", "@vueuse/nuxt", "@nuxtjs/i18n", "@nuxt/content"],
