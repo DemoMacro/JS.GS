@@ -26,6 +26,9 @@ RUN pnpx rolldown --input ./scripts/migrate.ts --format esm --file ./.output/scr
 FROM node:24-alpine AS production
 WORKDIR /app
 
+# Install wget for health check
+RUN apk add --no-cache wget
+
 # Copy .output directory (which now contains migrate.mjs)
 COPY --from=build /app/.output /app
 
@@ -34,5 +37,4 @@ ENV NODE_ENV=production
 ENV PORT=3000
 
 # run the app
-EXPOSE 3000/tcp
 ENTRYPOINT ["sh", "-c", "node /app/scripts/migrate.mjs && node /app/server/index.mjs"]

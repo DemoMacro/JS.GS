@@ -62,6 +62,8 @@ pnpm run preview
 
 #### Docker Deployment
 
+> **Note**: For accurate analytics and geolocation tracking, use `host` network mode. Bridge network mode may cause the application to receive Docker's internal IP instead of the real client IP, making analytics data less useful.
+
 ##### Option 1: Using Docker Compose (Recommended)
 
 ```bash
@@ -89,10 +91,10 @@ The application will be available at `http://localhost:3000`
 # Pull the official image
 docker pull demomacro/js.gs:latest
 
-# Run container
+# Run container with host network
 docker run -d \
   --name js-gs \
-  -p 3000:3000 \
+  --network host \
   --env-file .env \
   --restart unless-stopped \
   demomacro/js.gs:latest
@@ -111,7 +113,15 @@ docker rm js-gs
 # Build Docker image
 docker build -t js.gs .
 
-# Run container
+# Run container with host network (recommended)
+docker run -d \
+  --name js-gs \
+  --network host \
+  --env-file .env \
+  --restart unless-stopped \
+  js.gs
+
+# Or use bridge network with port mapping
 docker run -d \
   --name js-gs \
   -p 3000:3000 \
