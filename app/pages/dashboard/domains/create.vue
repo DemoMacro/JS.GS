@@ -124,11 +124,17 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
               name="organizationId"
               label="Organization"
               :description="
-                activeOrg ? `Creating for: ${activeOrg.name}` : 'Creating as personal domain'
+                activeOrg
+                  ? `Creating for: ${activeOrg.name}`
+                  : 'Select an organization to create this domain'
               "
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
-              <UInput :model-value="activeOrg?.name || 'Personal'" disabled class="w-full" />
+              <UInput
+                :model-value="activeOrg?.name || 'No organization selected'"
+                disabled
+                class="w-full"
+              />
             </UFormField>
 
             <USeparator />

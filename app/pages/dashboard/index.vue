@@ -89,10 +89,8 @@ const {
     // Build query based on active organization
     const query: Record<string, any> = { limit: 5 };
 
-    // Always use organization ID for authenticated users
-    if (personalOrg.value?.id) {
-      query.organizationId = personalOrg.value.id;
-    } else if (activeOrg.value?.id) {
+    // Use active organization for filtering
+    if (activeOrg.value?.id) {
       query.organizationId = activeOrg.value.id;
     }
 

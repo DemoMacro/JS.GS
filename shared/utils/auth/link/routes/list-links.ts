@@ -55,9 +55,7 @@ export const listLinks = () => {
       });
 
       // Build join options - only join when needed
-      // Personal mode: no joins needed
-      // Organization mode: join user and organization data
-      // Global admin: always join to show full context
+      // Join when fetching for a specific organization or for global admin
       const shouldJoin = session.user.role === "admin" || organizationId;
 
       // Fetch links with pagination and optional joins

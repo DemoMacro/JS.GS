@@ -114,12 +114,9 @@ const {
     };
 
     // Add organization filter for organization mode
-    if (props.mode === "organization") {
-      if (personalOrg.value?.id) {
-        query.organizationId = personalOrg.value.id;
-      } else if (activeOrg.value?.id) {
-        query.organizationId = activeOrg.value.id;
-      }
+    // Use activeOrg which represents the user's currently selected organization
+    if (props.mode === "organization" && activeOrg.value?.id) {
+      query.organizationId = activeOrg.value.id;
     }
 
     const result = await authClient.link.list({
@@ -180,8 +177,8 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
     },
   ];
 
-  // Add Created By column in organization mode or for global admin
-  const shouldShowCreatedBy = props.mode === "organization" || isAdmin.value;
+  // Add Created By column in organization mode or admin mode
+  const shouldShowCreatedBy = props.mode === "organization" || props.mode === "admin";
   if (shouldShowCreatedBy) {
     baseColumns.splice(2, 0, {
       accessorKey: "createdBy",
@@ -190,7 +187,7 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
   }
 
   // Add Organization column for admin mode
-  if (props.mode === "admin" && isAdmin.value) {
+  if (props.mode === "admin") {
     baseColumns.splice(2, 0, {
       accessorKey: "organization",
       header: "Organization",

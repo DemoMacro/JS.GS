@@ -37,17 +37,17 @@ const adminLinks = [
     },
   },
   {
-    label: "Links",
-    icon: "i-lucide-link",
-    to: "/admin/links",
+    label: "Sessions",
+    icon: "i-lucide-activity",
+    to: "/admin/sessions",
     onSelect: () => {
       open.value = false;
     },
   },
   {
-    label: "Sessions",
-    icon: "i-lucide-activity",
-    to: "/admin/sessions",
+    label: "Links",
+    icon: "i-lucide-link",
+    to: "/admin/links",
     onSelect: () => {
       open.value = false;
     },

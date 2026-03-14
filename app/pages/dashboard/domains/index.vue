@@ -63,10 +63,8 @@ const query = computed(() => {
     offset: pagination.value.pageIndex * pagination.value.pageSize,
   };
 
-  // Always use organization ID for authenticated users
-  if (personalOrg.value?.id) {
-    q.organizationId = personalOrg.value.id;
-  } else if (activeOrg.value?.id) {
+  // Use active organization for filtering
+  if (activeOrg.value?.id) {
     q.organizationId = activeOrg.value.id;
   }
 

@@ -105,14 +105,13 @@ const items = computed<DropdownMenuItem[][]>(() => {
   const teamOrgs = orgList?.filter((org: Organization) => !org.slug?.startsWith("user_")) || [];
 
   const organizationOptions = [
-    // Personal organization at top
+    // Personal organization
     ...(personalOrg
       ? [
           {
             label: personalOrg.name,
             icon: "i-lucide-user",
             id: personalOrg.id,
-            badge: "Personal",
             onSelect: () => switchContext(personalOrg.id),
           },
         ]

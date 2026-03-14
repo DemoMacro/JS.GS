@@ -57,15 +57,8 @@ export async function buildLinkWhereConditions(params: {
 }): Promise<Array<{ field: string; value: string | number | null }>> {
   const { userId, userRole, organizationId, status, adapter } = params;
 
-  // Global admin can see all links
-  if (userRole === "admin") {
-    const conditions: Array<{ field: string; value: string | number | null }> = [];
-    if (organizationId) conditions.push({ field: "organizationId", value: organizationId });
-    if (status) conditions.push({ field: "status", value: status });
-    return conditions;
-  }
-
-  // Organization mode
+  // When organization ID is explicitly provided, only return data for that
+  // specific organization regardless of user role. Must verify membership first.
   if (organizationId) {
     const member = await adapter.findOne<Member>({
       model: "member",
@@ -97,7 +90,15 @@ export async function buildLinkWhereConditions(params: {
     ];
   }
 
-  // Personal mode - only show personal links (createdBy matches AND orgId is null)
+  // When no organization ID is provided, apply permission-based filtering
+  // Global admin can see all links across all organizations
+  if (userRole === "admin") {
+    const conditions: Array<{ field: string; value: string | number | null }> = [];
+    if (status) conditions.push({ field: "status", value: status });
+    return conditions; // Empty conditions = query all
+  }
+
+  // Regular users only see personal links (createdBy matches AND orgId is null)
   return [
     { field: "createdBy", value: userId },
     { field: "organizationId", value: null },
