@@ -1,9 +1,10 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
 import { z } from "zod";
+
+import { chdb } from "../../../../../server/utils/database";
 import type { Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
-import { chdb } from "../../../../../server/utils/database";
 
 const EventsQuerySchema = z.object({
   linkId: z.string(),

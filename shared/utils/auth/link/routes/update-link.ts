@@ -1,10 +1,11 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
-import { UpdateLinkSchema, type Link } from "../../../../types/link";
-import { canAccessLink } from "../permissions";
+
 import type { Domain } from "../../../../types/domain";
+import { UpdateLinkSchema, type Link } from "../../../../types/link";
 import { canAccessDomain } from "../../domain/permissions";
 import { setLink, removeLink } from "../cache";
+import { canAccessLink } from "../permissions";
 
 export const updateLink = () => {
   return createAuthEndpoint(

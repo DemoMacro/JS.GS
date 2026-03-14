@@ -1,6 +1,6 @@
-import { db } from "~~/server/utils/database";
 import { sendRedirect } from "h3";
 import { trackClickEvent } from "~~/server/utils/analytics/track";
+import { db } from "~~/server/utils/database";
 import { getLink, setLink } from "~~/shared/utils/auth/link/cache";
 
 export default defineEventHandler(async (event) => {

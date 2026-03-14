@@ -1,5 +1,6 @@
-import { authClient } from "~/utils/auth";
 import type { DomainStatus } from "~~/shared/types/domain";
+
+import { authClient } from "~/utils/auth";
 
 export interface DomainOption {
   label: string;

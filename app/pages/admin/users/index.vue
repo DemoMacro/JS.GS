@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { UserWithRole } from "better-auth/plugins";
 import type { TableColumn } from "@nuxt/ui";
 import { getPaginationRowModel } from "@tanstack/table-core";
+import type { UserWithRole } from "better-auth/plugins";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Users - Admin - JS.GS",
 });
 
@@ -130,7 +130,7 @@ const columns: TableColumn<UserWithRole>[] = [
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 flex-1">
+      <div class="flex flex-1 flex-col gap-4">
         <!-- Search and Controls -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <UInput
@@ -200,9 +200,9 @@ const columns: TableColumn<UserWithRole>[] = [
               />
               <div
                 v-else
-                class="size-8 bg-primary/10 rounded-full flex items-center justify-center"
+                class="bg-primary/10 flex size-8 items-center justify-center rounded-full"
               >
-                <UIcon name="i-lucide-user" class="size-4 text-primary" />
+                <UIcon name="i-lucide-user" class="text-primary size-4" />
               </div>
             </template>
 
@@ -228,10 +228,10 @@ const columns: TableColumn<UserWithRole>[] = [
             <template #banned-cell="{ row }">
               <div v-if="row.getValue('banned')" class="space-y-1">
                 <UBadge color="error" variant="soft" size="sm"> Banned </UBadge>
-                <div v-if="row.getValue('banReason')" class="text-xs text-muted-foreground">
+                <div v-if="row.getValue('banReason')" class="text-muted-foreground text-xs">
                   {{ row.getValue("banReason") }}
                 </div>
-                <div v-if="row.getValue('banExpires')" class="text-xs text-muted-foreground">
+                <div v-if="row.getValue('banExpires')" class="text-muted-foreground text-xs">
                   Expires:
                   {{ new Date(row.getValue("banExpires")).toLocaleDateString() }}
                 </div>
@@ -240,13 +240,13 @@ const columns: TableColumn<UserWithRole>[] = [
             </template>
 
             <template #createdAt-cell="{ row }">
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 {{ new Date(row.getValue("createdAt")).toLocaleDateString() }}
               </span>
             </template>
 
             <template #updatedAt-cell="{ row }">
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 {{ new Date(row.getValue("updatedAt")).toLocaleDateString() }}
               </span>
             </template>
@@ -284,8 +284,8 @@ const columns: TableColumn<UserWithRole>[] = [
         </div>
 
         <!-- Pagination Footer -->
-        <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-          <div class="text-sm text-muted-foreground">
+        <div class="border-default mt-auto flex items-center justify-between gap-3 border-t pt-4">
+          <div class="text-muted-foreground text-sm">
             Showing {{ users.length }} of {{ total }} users
           </div>
 

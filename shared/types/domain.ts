@@ -5,7 +5,8 @@ export const DomainStatusSchema = z.enum(["pending", "active", "inactive"]);
 export const DomainSchema = z.object({
   id: z.uuid(),
   domainName: z.string().regex(z.regexes.domain, "Invalid domain name format"),
-  userId: z.uuid().nullable(),
+  createdBy: z.uuid().nullable(),
+  updatedBy: z.uuid().nullable(),
   organizationId: z.uuid().nullable(),
   status: DomainStatusSchema.default("pending"),
   verificationToken: z.string().nullable(),

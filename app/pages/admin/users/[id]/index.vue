@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
 
 const route = useRoute();
 const userId = route.params.id as string;
@@ -57,12 +57,12 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 </script>
 
 <template>
-  <div v-if="loading" class="flex items-center justify-center h-64">
-    <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
+  <div v-if="loading" class="flex h-64 items-center justify-center">
+    <UIcon name="i-lucide-loader-2" class="size-8 animate-spin" />
   </div>
 
-  <div v-else-if="!user" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">User not found</h3>
+  <div v-else-if="!user" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">User not found</h3>
     <p class="text-muted-foreground mb-4">
       The user you're looking for doesn't exist or you don't have permission to view it.
     </p>
@@ -78,7 +78,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         orientation="horizontal"
         class="mb-4"
       >
-        <div class="flex gap-3 w-fit lg:ms-auto">
+        <div class="flex w-fit gap-3 lg:ms-auto">
           <UButton
             :to="`/admin/users/${userId}/security`"
             label="Security Settings"
@@ -95,7 +95,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           label="Name"
           description="Will appear on receipts, invoices, and other communication."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="profile.name" autocomplete="off" />
         </UFormField>
@@ -105,7 +105,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           label="Email"
           description="This is your email address."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="profile.email" type="email" autocomplete="off" />
         </UFormField>
@@ -114,7 +114,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           name="image"
           label="Avatar URL"
           description="URL to user's profile image."
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="profile.image"
@@ -127,7 +127,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           name="emailVerified"
           label="Email Verified"
           description="Whether the user's email has been verified."
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UCheckbox v-model="profile.emailVerified" />
         </UFormField>
@@ -137,7 +137,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           label="Role"
           description="User role determines access permissions."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <USelect
             v-model="profile.role"

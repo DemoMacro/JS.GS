@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
@@ -62,7 +63,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+  <div class="bg-background flex min-h-screen items-center justify-center px-4 py-12">
     <UPageCard class="w-full max-w-md">
       <template v-if="!emailSent">
         <UAuthForm
@@ -90,9 +91,9 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       </template>
 
       <template v-else>
-        <div class="text-center space-y-6">
+        <div class="space-y-6 text-center">
           <div class="flex justify-center">
-            <UIcon name="i-lucide-mail-check" class="size-16 text-primary" />
+            <UIcon name="i-lucide-mail-check" class="text-primary size-16" />
           </div>
           <div class="space-y-2">
             <h2 class="text-2xl font-semibold">Check Your Email</h2>
@@ -102,12 +103,12 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             </p>
           </div>
           <div class="space-y-4">
-            <p class="text-sm text-muted">
+            <p class="text-muted text-sm">
               Didn't receive the email? Click the button below to resend.
             </p>
             <UButton label="Resend Email" variant="outline" block @click="emailSent = false" />
           </div>
-          <div class="pt-4 border-t">
+          <div class="border-t pt-4">
             <ULink to="/auth/sign-in" class="text-primary font-medium"> Back to Sign In </ULink>
           </div>
         </div>

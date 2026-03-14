@@ -2,7 +2,6 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Organization - Dashboard - JS.GS",
 });
 
@@ -48,9 +47,9 @@ const links = computed<NavigationMenuItem[][]>(() => [
     </template>
 
     <template #body>
-      <div v-if="!activeOrg" class="text-center py-8">
-        <UIcon name="i-lucide-building" class="size-12 text-muted-foreground mx-auto mb-4" />
-        <h3 class="text-lg font-semibold text-muted-foreground mb-2">No Active Organization</h3>
+      <div v-if="!activeOrg" class="py-8 text-center">
+        <UIcon name="i-lucide-building" class="text-muted-foreground mx-auto mb-4 size-12" />
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">No Active Organization</h3>
         <p class="text-muted-foreground mb-4">
           Please select an organization from the menu or create a new one.
         </p>
@@ -62,7 +61,7 @@ const links = computed<NavigationMenuItem[][]>(() => [
         </UButton>
       </div>
 
-      <div v-else class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
+      <div v-else class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <NuxtPage />
       </div>
     </template>

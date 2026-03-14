@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import type { Link } from "~~/shared/types/link";
-import { authClient } from "~/utils/auth";
+
 import { useDomains } from "~/composables/useDomains";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
   title: "Dashboard - JS.GS",
@@ -28,6 +29,18 @@ const { domains } = useDomains();
 // Get active organization
 const activeOrgResult = authClient.useActiveOrganization();
 const activeOrg = computed(() => activeOrgResult.value.data);
+
+// Get personal organization
+const { personalOrg } = useOrganizations();
+
+// Auto-set personal organization as active if no org is active
+watchEffect(async () => {
+  if (personalOrg.value && !activeOrg.value) {
+    await authClient.organization.setActive({
+      organizationId: personalOrg.value.id,
+    });
+  }
+});
 
 // Watch copied state and show toast notification
 watch(copied, (isCopied) => {
@@ -75,7 +88,11 @@ const {
   async () => {
     // Build query based on active organization
     const query: Record<string, any> = { limit: 5 };
-    if (activeOrg.value?.id) {
+
+    // Always use organization ID for authenticated users
+    if (personalOrg.value?.id) {
+      query.organizationId = personalOrg.value.id;
+    } else if (activeOrg.value?.id) {
       query.organizationId = activeOrg.value.id;
     }
 
@@ -89,7 +106,7 @@ const {
       links: data?.links ?? [],
       total: data?.total ?? 0,
     }),
-    watch: [activeOrg], // Re-fetch when active organization changes
+    watch: [activeOrg, personalOrg], // Re-fetch when active organization changes
   },
 );
 
@@ -127,10 +144,10 @@ watch(error, (newError) => {
       <UPageCard>
         <template #header>
           <h3 class="text-lg font-semibold">Quick Actions</h3>
-          <p class="text-sm text-muted-foreground">Common link management tasks</p>
+          <p class="text-muted-foreground text-sm">Common link management tasks</p>
         </template>
 
-        <UPageGrid class="sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <UPageGrid class="gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <UButton to="/dashboard/links/create" variant="outline" class="justify-start">
             <UIcon name="i-lucide-plus" class="mr-2" />
             Create Link
@@ -148,7 +165,7 @@ watch(error, (newError) => {
           <div class="flex items-center justify-between">
             <div>
               <h3 class="text-lg font-semibold">Recent Links</h3>
-              <p class="text-sm text-muted-foreground">Your most recently created links</p>
+              <p class="text-muted-foreground text-sm">Your most recently created links</p>
             </div>
             <UButton
               to="/dashboard/links"
@@ -161,13 +178,13 @@ watch(error, (newError) => {
           </div>
         </template>
 
-        <div v-if="loading" class="text-center py-8">
-          <UIcon name="i-lucide-loader-2" class="size-8 mx-auto mb-4 animate-spin" />
+        <div v-if="loading" class="py-8 text-center">
+          <UIcon name="i-lucide-loader-2" class="mx-auto mb-4 size-8 animate-spin" />
           <p class="text-muted-foreground">Loading links...</p>
         </div>
 
-        <div v-else-if="recentLinks.length === 0" class="text-muted-foreground text-center py-8">
-          <UIcon name="i-lucide-link" class="size-12 mx-auto mb-4 opacity-50" />
+        <div v-else-if="recentLinks.length === 0" class="text-muted-foreground py-8 text-center">
+          <UIcon name="i-lucide-link" class="mx-auto mb-4 size-12 opacity-50" />
           <p>No links yet.</p>
           <p class="text-sm">Create your first short link to get started!</p>
         </div>
@@ -175,25 +192,25 @@ watch(error, (newError) => {
         <div v-else>
           <template v-for="(link, index) in recentLinks" :key="link.id">
             <div
-              class="flex items-center justify-between gap-4 px-6 py-3 hover:bg-muted/50 transition-colors w-full"
+              class="hover:bg-muted/50 flex w-full items-center justify-between gap-4 px-6 py-3 transition-colors"
             >
               <NuxtLink
                 :to="`${getLinkDomain(link)}/s/${link.shortCode}`"
-                class="flex items-center gap-3 flex-1 min-w-0"
+                class="flex min-w-0 flex-1 items-center gap-3"
                 target="_blank"
               >
-                <UIcon name="i-lucide-link" class="size-4 text-muted-foreground shrink-0" />
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium truncate">
+                <UIcon name="i-lucide-link" class="text-muted-foreground size-4 shrink-0" />
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-medium">
                     {{ link.title || link.shortCode }}
                   </p>
-                  <p class="text-xs text-muted-foreground truncate">
+                  <p class="text-muted-foreground truncate text-xs">
                     {{ getLinkDomain(link) }}/s/{{ link.shortCode }}
                   </p>
                 </div>
               </NuxtLink>
 
-              <div class="flex items-center gap-1 shrink-0">
+              <div class="flex shrink-0 items-center gap-1">
                 <UButton
                   :to="`/dashboard/links/${link.id}`"
                   variant="ghost"

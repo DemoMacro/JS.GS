@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
-import type { Domain } from "~~/shared/types/domain";
 import { getPaginationRowModel } from "@tanstack/table-core";
-import { authClient } from "~/utils/auth";
+import type { Domain } from "~~/shared/types/domain";
+
 import { useDomains } from "~/composables/useDomains";
+import { useOrganizations } from "~/composables/useOrganizations";
+import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Domains - Dashboard - JS.GS",
 });
 
@@ -25,6 +26,18 @@ const toast = useToast();
 // Get active organization
 const activeOrgResult = authClient.useActiveOrganization();
 const activeOrg = computed(() => activeOrgResult.value.data);
+
+// Get personal organization
+const { personalOrg } = useOrganizations();
+
+// Auto-set personal organization as active if no org is active
+watchEffect(async () => {
+  if (personalOrg.value && !activeOrg.value) {
+    await authClient.organization.setActive({
+      organizationId: personalOrg.value.id,
+    });
+  }
+});
 
 async function copyToClipboard(token: string) {
   try {
@@ -49,9 +62,14 @@ const query = computed(() => {
     limit: pagination.value.pageSize,
     offset: pagination.value.pageIndex * pagination.value.pageSize,
   };
-  if (activeOrg.value?.id) {
+
+  // Always use organization ID for authenticated users
+  if (personalOrg.value?.id) {
+    q.organizationId = personalOrg.value.id;
+  } else if (activeOrg.value?.id) {
     q.organizationId = activeOrg.value.id;
   }
+
   return q;
 });
 
@@ -110,7 +128,7 @@ const columns: TableColumn<Domain>[] = [
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 flex-1">
+      <div class="flex flex-1 flex-col gap-4">
         <!-- Search and Controls -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <UInput
@@ -207,26 +225,26 @@ const columns: TableColumn<Domain>[] = [
                   <UButton variant="ghost" icon="i-lucide-info" title="Verification Info" />
 
                   <template #content>
-                    <div class="p-4 max-w-sm">
-                      <p class="text-sm font-medium mb-2">DNS Verification</p>
-                      <p class="text-sm text-muted-foreground mb-2">
+                    <div class="max-w-sm p-4">
+                      <p class="mb-2 text-sm font-medium">DNS Verification</p>
+                      <p class="text-muted-foreground mb-2 text-sm">
                         Add this TXT record to your domain's DNS configuration:
                       </p>
-                      <div class="bg-muted rounded p-3 space-y-1">
+                      <div class="bg-muted space-y-1 rounded p-3">
                         <div class="flex items-center gap-2">
                           <span class="text-sm font-medium">Type:</span>
                           <UBadge variant="subtle">TXT</UBadge>
                         </div>
                         <div class="flex items-center gap-2">
                           <span class="text-sm font-medium">Host/Name:</span>
-                          <span class="text-sm font-mono">@</span>
-                          <span class="text-xs text-muted-foreground"
+                          <span class="font-mono text-sm">@</span>
+                          <span class="text-muted-foreground text-xs"
                             >(or {{ row.original.domainName }})</span
                           >
                         </div>
                         <div class="flex items-center gap-2">
                           <span class="text-sm font-medium">Value:</span>
-                          <span class="text-sm font-mono break-all">
+                          <span class="font-mono text-sm break-all">
                             {{ row.original.verificationToken }}
                           </span>
                         </div>
@@ -257,8 +275,8 @@ const columns: TableColumn<Domain>[] = [
         </div>
 
         <!-- Pagination Footer -->
-        <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-          <div class="text-sm text-muted-foreground">
+        <div class="border-default mt-auto flex items-center justify-between gap-3 border-t pt-4">
+          <div class="text-muted-foreground text-sm">
             Showing
             {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} of {{ total }} domains
           </div>

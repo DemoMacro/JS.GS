@@ -39,19 +39,19 @@ const items = computed<DropdownMenuItem[]>(() => [
 </script>
 
 <template>
-  <ul role="list" class="divide-y divide-default">
+  <ul role="list" class="divide-default divide-y">
     <li
       v-for="(member, index) in members"
       :key="index"
-      class="flex items-center justify-between gap-3 py-4 px-4 sm:px-6"
+      class="flex items-center justify-between gap-3 px-4 py-4 sm:px-6"
     >
-      <div class="flex items-center gap-3 min-w-0">
-        <div class="size-10 bg-primary/10 rounded-full flex items-center justify-center">
+      <div class="flex min-w-0 items-center gap-3">
+        <div class="bg-primary/10 flex size-10 items-center justify-center rounded-full">
           <UIcon name="i-lucide-user" class="size-5" />
         </div>
 
-        <div class="text-sm min-w-0">
-          <p class="font-medium truncate">
+        <div class="min-w-0 text-sm">
+          <p class="truncate font-medium">
             {{ member.user.name }}
           </p>
           <p class="text-muted truncate">

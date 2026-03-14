@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
+
 import { authClient } from "~/utils/auth";
 
 const route = useRoute();
@@ -39,7 +40,7 @@ const items = computed<NavigationMenuItem[]>(() => {
   <UApp>
     <UHeader>
       <template #title>
-        <NuxtLink to="/" class="flex items-center gap-1.5 font-semibold text-lg"> JS.GS </NuxtLink>
+        <NuxtLink to="/" class="flex items-center gap-1.5 text-lg font-semibold"> JS.GS </NuxtLink>
       </template>
 
       <UNavigationMenu :items="items" />
@@ -70,7 +71,7 @@ const items = computed<NavigationMenuItem[]>(() => {
 
     <UFooter>
       <template #left>
-        <p class="text-sm text-muted-foreground">JS.GS • {{ new Date().getFullYear() }}</p>
+        <p class="text-muted-foreground text-sm">JS.GS • {{ new Date().getFullYear() }}</p>
       </template>
 
       <UNavigationMenu

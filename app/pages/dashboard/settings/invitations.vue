@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { authClient } from "~/utils/auth";
 import type { Invitation } from "better-auth/plugins";
 
+import { authClient } from "~/utils/auth";
+
 definePageMeta({
-  layout: "dashboard",
   title: "Invitations - Settings - Dashboard - JS.GS",
 });
 
@@ -119,7 +119,7 @@ function formatDate(date: Date | string) {
       }"
     >
       <template #header>
-        <div class="flex items-center justify-between w-full">
+        <div class="flex w-full items-center justify-between">
           <h3 class="text-lg font-semibold">Organization Invitations</h3>
           <UButton
             icon="i-lucide-refresh-ccw"
@@ -133,30 +133,30 @@ function formatDate(date: Date | string) {
 
       <!-- Loading State -->
       <div v-if="loading && invitations.length === 0" class="flex items-center justify-center py-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin size-6" />
+        <UIcon name="i-lucide-loader-2" class="size-6 animate-spin" />
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="invitations.length === 0" class="text-center py-8">
-        <UIcon name="i-lucide-mail" class="size-12 text-muted mx-auto mb-4" />
-        <h3 class="text-lg font-semibold mb-2">No invitations</h3>
-        <p class="text-sm text-muted">You don't have any organization invitations.</p>
+      <div v-else-if="invitations.length === 0" class="py-8 text-center">
+        <UIcon name="i-lucide-mail" class="text-muted mx-auto mb-4 size-12" />
+        <h3 class="mb-2 text-lg font-semibold">No invitations</h3>
+        <p class="text-muted text-sm">You don't have any organization invitations.</p>
       </div>
 
       <!-- Invitations List -->
-      <ul v-else role="list" class="divide-y divide-default">
+      <ul v-else role="list" class="divide-default divide-y">
         <li
           v-for="(invitation, index) in invitations"
           :key="index"
-          class="flex items-center justify-between gap-3 py-4 px-4 sm:px-6"
+          class="flex items-center justify-between gap-3 px-4 py-4 sm:px-6"
         >
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="size-10 bg-primary/10 rounded-full flex items-center justify-center">
+          <div class="flex min-w-0 items-center gap-3">
+            <div class="bg-primary/10 flex size-10 items-center justify-center rounded-full">
               <UIcon name="i-lucide-building-2" class="size-5" />
             </div>
 
-            <div class="text-sm min-w-0">
-              <p class="font-medium truncate">
+            <div class="min-w-0 text-sm">
+              <p class="truncate font-medium">
                 {{ invitation.organizationName }}
               </p>
               <p class="text-muted truncate">

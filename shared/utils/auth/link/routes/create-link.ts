@@ -1,9 +1,10 @@
+import type { GenericEndpointContext } from "better-auth";
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx } from "better-auth/api";
-import { CreateLinkSchema, type Link } from "../../../../types/link";
-import type { GenericEndpointContext } from "better-auth";
-import type { Member } from "better-auth/plugins";
+import type { Member, Organization } from "better-auth/plugins";
+
 import type { Domain } from "../../../../types/domain";
+import { CreateLinkSchema, type Link } from "../../../../types/link";
 import { canAccessDomain } from "../../domain/permissions";
 import { setLink } from "../cache";
 
@@ -42,7 +43,45 @@ export const createLink = () => {
       // Optional authentication - allow anonymous link creation
       const session = await getSessionFromCtx(ctx);
 
-      const { organizationId, originalUrl, title, description, expiresAt, domainId } = ctx.body;
+      let { organizationId, originalUrl, title, description, expiresAt, domainId } = ctx.body;
+
+      // For authenticated users without organization, auto-use/create personal organization
+      if (session?.user && !organizationId) {
+        const personalOrgSlug = `user_${session.user.id}`;
+
+        // Try to find existing personal organization
+        const personalOrg = await ctx.context.adapter.findOne<Organization>({
+          model: "organization",
+          where: [{ field: "slug", value: personalOrgSlug }],
+        });
+
+        if (personalOrg) {
+          organizationId = personalOrg.id;
+        } else {
+          // Create personal organization if it doesn't exist
+          const newOrg = await ctx.context.adapter.create<Organization>({
+            model: "organization",
+            data: {
+              name: `${session.user.name || session.user.username}'s Workspace`,
+              slug: personalOrgSlug,
+              createdAt: new Date(),
+            },
+          });
+
+          // Add user as owner
+          await ctx.context.adapter.create<Member>({
+            model: "member",
+            data: {
+              organizationId: newOrg.id,
+              userId: session.user.id,
+              role: "owner",
+              createdAt: new Date(),
+            },
+          });
+
+          organizationId = newOrg.id;
+        }
+      }
 
       // Check organization membership if provided
       if (organizationId) {
@@ -125,7 +164,8 @@ export const createLink = () => {
       const newLink = {
         shortCode,
         originalUrl,
-        userId: session?.user?.id || null,
+        createdBy: session?.user?.id || null,
+        updatedBy: session?.user?.id || null,
         organizationId: organizationId || null,
         domainId: domainId || null,
         title: title || null,

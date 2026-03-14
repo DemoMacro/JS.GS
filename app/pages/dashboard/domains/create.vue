@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Create Domain - Dashboard - JS.GS",
 });
 
@@ -75,7 +75,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
+      <div class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <UForm id="create-domain" :schema="schema" :state="state" @submit="createDomain">
           <UPageCard
             title="Add Custom Domain"
@@ -84,7 +84,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
             orientation="horizontal"
             class="mb-4"
           >
-            <div class="flex gap-3 ms-auto">
+            <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/dashboard/domains" :disabled="submitting">
                 Cancel
               </UButton>
@@ -108,7 +108,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
               label="Domain Name"
               description="The domain you want to use (e.g., example.com)."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.domainName"
@@ -126,7 +126,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
               :description="
                 activeOrg ? `Creating for: ${activeOrg.name}` : 'Creating as personal domain'
               "
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput :model-value="activeOrg?.name || 'Personal'" disabled class="w-full" />
             </UFormField>
@@ -134,7 +134,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
             <USeparator />
 
             <p class="text-sm font-medium">⚠️ DNS Verification Required</p>
-            <p class="text-sm text-muted-foreground">
+            <p class="text-muted-foreground text-sm">
               After creating this domain, you'll need to verify ownership by adding a TXT record to
               your domain's DNS configuration.
             </p>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { useDomains } from "~/composables/useDomains";
 import { useOrganizations } from "~/composables/useOrganizations";
 
@@ -24,13 +25,12 @@ const { domainOptions, loading: domainsLoading } = useDomains();
 const { organizations, loading: orgsLoading } = useOrganizations();
 
 // Organization options for select
-const organizationOptions = computed(() => [
-  { label: "Personal", value: "personal" },
-  ...organizations.value.map((org) => ({
+const organizationOptions = computed(() =>
+  organizations.value.map((org) => ({
     label: org.name,
     value: org.id,
   })),
-]);
+);
 </script>
 
 <template>
@@ -38,9 +38,8 @@ const organizationOptions = computed(() => [
     <UFormField
       name="organizationId"
       label="Organization"
-      description="Choose whether this link belongs to you personally or to an organization"
-      required
-      class="flex max-sm:flex-col justify-between items-start gap-4"
+      description="Select the organization for this link"
+      class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <USelect
         v-model="state.organizationId"
@@ -74,7 +73,7 @@ const organizationOptions = computed(() => [
       name="domainId"
       label="Custom Domain (Optional)"
       description="Select a verified custom domain for this link"
-      class="flex max-sm:flex-col justify-between items-start gap-4"
+      class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <USelect
         v-if="domainOptions.length > 0"
@@ -93,7 +92,7 @@ const organizationOptions = computed(() => [
       name="title"
       label="Title"
       description="A descriptive title for your link (optional)."
-      class="flex max-sm:flex-col justify-between items-start gap-4"
+      class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <UInput
         v-model="state.title"
@@ -127,7 +126,7 @@ const organizationOptions = computed(() => [
       label="Status"
       description="Control whether this link is active"
       required
-      class="flex max-sm:flex-col justify-between items-start gap-4"
+      class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <USelect
         v-model="state.status"
@@ -147,7 +146,7 @@ const organizationOptions = computed(() => [
       name="expiresAt"
       label="Expiration Date"
       description="Optionally set when this link should expire (optional)."
-      class="flex max-sm:flex-col justify-between items-start gap-4"
+      class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <UInput
         v-model="state.expiresAt"

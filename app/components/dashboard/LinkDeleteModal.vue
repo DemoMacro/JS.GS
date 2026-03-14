@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Link } from "~~/shared/types/link";
 import * as z from "zod";
+import type { Link } from "~~/shared/types/link";
+
 import { authClient } from "~/utils/auth";
 
 const props = defineProps<{

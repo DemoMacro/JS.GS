@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Create API Key - Dashboard - JS.GS",
 });
 
@@ -94,7 +94,7 @@ watch(copied, (isCopied) => {
     </template>
 
     <template #body>
-      <div class="w-full lg:max-w-2xl mx-auto">
+      <div class="mx-auto w-full lg:max-w-2xl">
         <!-- Show API Key after successful creation -->
         <div v-if="createdKey" class="space-y-4">
           <UPageCard
@@ -104,7 +104,7 @@ watch(copied, (isCopied) => {
           >
             <div class="space-y-4">
               <div>
-                <label class="text-sm font-medium mb-2 block">Your API Key</label>
+                <label class="mb-2 block text-sm font-medium">Your API Key</label>
                 <div class="flex gap-2">
                   <UInput
                     :value="createdKey.key"
@@ -155,7 +155,7 @@ watch(copied, (isCopied) => {
             orientation="horizontal"
             class="mb-4"
           >
-            <div class="flex gap-3 ms-auto">
+            <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/dashboard/apikeys" :disabled="submitting">
                 Cancel
               </UButton>
@@ -173,7 +173,7 @@ watch(copied, (isCopied) => {
               label="Name"
               description="Give your API key a meaningful name to help you identify it later."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.name"
@@ -190,7 +190,7 @@ watch(copied, (isCopied) => {
               label="Expiration"
               description="Set how long this API key should remain valid. After expiration, it will no longer work."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <USelect
                 v-model="state.expiresIn"
@@ -210,8 +210,8 @@ watch(copied, (isCopied) => {
             <USeparator />
 
             <div>
-              <h4 class="font-medium mb-2">Important Notes</h4>
-              <ul class="text-sm text-muted-foreground space-y-1">
+              <h4 class="mb-2 font-medium">Important Notes</h4>
+              <ul class="text-muted-foreground space-y-1 text-sm">
                 <li>• API keys inherit your account permissions automatically</li>
                 <li>• You can only view the full API key once immediately after creation</li>
                 <li>• Treat API keys like passwords - keep them secure and never share them</li>

@@ -1,10 +1,11 @@
+import { toStartOfInterval, rawAs } from "@hypequery/clickhouse";
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
 import { z } from "zod";
+
+import { chdb } from "../../../../../server/utils/database";
 import type { Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
-import { chdb } from "../../../../../server/utils/database";
-import { toStartOfInterval, rawAs } from "@hypequery/clickhouse";
 
 // GroupBy options matching Dub.co API
 const AnalyticsGroupBySchema = z.enum([
@@ -103,7 +104,7 @@ export const getAnalytics = () => {
             .select([
               rawAs(
                 "uniqExact(concat(ip, '|', browserMajor, '|', osVersion, '|', deviceVendor, '|', deviceModel))",
-                "uniqueVisitors"
+                "uniqueVisitors",
               ),
             ])
             .execute();

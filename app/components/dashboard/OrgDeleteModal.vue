@@ -11,6 +11,24 @@ const toast = useToast();
 const open = ref(false);
 const loading = ref(false);
 
+// Watch modal open state to show toast for personal orgs
+watch(open, (isOpen) => {
+  if (isOpen && isPersonalOrg.value) {
+    toast.add({
+      title: "Cannot Delete Personal Organization",
+      description: "Personal organizations are automatically managed and cannot be deleted.",
+      color: "error",
+    });
+    // Immediately close the modal
+    open.value = false;
+  }
+});
+
+// Check if this is a personal organization
+const isPersonalOrg = computed(() => {
+  return props.organization?.slug?.startsWith("user_") ?? false;
+});
+
 const emit = defineEmits<{
   refresh: [];
 }>();

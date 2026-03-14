@@ -1,4 +1,5 @@
 import type { Organization } from "better-auth/plugins";
+
 import { authClient } from "~/utils/auth";
 
 // Extended type for organization creation
@@ -16,6 +17,10 @@ export const useOrganizations = (options?: {
   offset?: number;
   searchValue?: string;
 }) => {
+  // Get current session
+  const sessionResult = authClient.useSession();
+  const session = computed(() => sessionResult.value.data);
+
   // Fetch organizations using useAsyncData for SSR optimization
   const {
     data: orgsData,
@@ -44,6 +49,18 @@ export const useOrganizations = (options?: {
 
   const organizations = computed(() => orgsData.value?.organizations ?? []);
   const total = computed(() => orgsData.value?.total ?? 0);
+
+  // Get personal organization for the current user
+  const personalOrg = computed(() => {
+    if (!session.value?.user) return null;
+    const personalOrgSlug = `user_${session.value.user.id}`;
+    return organizations.value.find((org) => org.slug === personalOrgSlug) || null;
+  });
+
+  // Get team organizations (excluding personal org)
+  const teamOrgs = computed(() => {
+    return organizations.value.filter((org) => !org.slug.startsWith("user_"));
+  });
 
   const createOrganization = async (data: OrganizationCreateData) => {
     const result = await authClient.organization.create(data);
@@ -82,6 +99,8 @@ export const useOrganizations = (options?: {
 
   return {
     organizations,
+    teamOrgs,
+    personalOrg,
     filteredOrganizations,
     loading,
     total,

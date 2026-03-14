@@ -45,7 +45,7 @@ async function leaveOrganization() {
     <UPageCard
       title="Delete Organization"
       description="No longer want to use this organization? You can delete it here. This action is not reversible - all information related to this organization will be deleted permanently."
-      class="bg-linear-to-tl from-error/10 from-5% to-default"
+      class="from-error/10 to-default bg-linear-to-tl from-5%"
     >
       <template #footer>
         <DashboardOrgDeleteModal :organization="organization" @refresh="emit('refresh')">

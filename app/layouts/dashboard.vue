@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
+
 import { authClient } from "~/utils/auth";
 
 const route = useRoute();
@@ -31,6 +32,14 @@ const adminLinks = [
     label: "Organizations",
     icon: "i-lucide-building",
     to: "/admin/orgs",
+    onSelect: () => {
+      open.value = false;
+    },
+  },
+  {
+    label: "Links",
+    icon: "i-lucide-link",
+    to: "/admin/links",
     onSelect: () => {
       open.value = false;
     },
@@ -182,7 +191,7 @@ onMounted(async () => {
       </template>
 
       <template #default="{ collapsed }">
-        <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
+        <UDashboardSearchButton :collapsed="collapsed" class="ring-default bg-transparent" />
 
         <UNavigationMenu
           :collapsed="collapsed"

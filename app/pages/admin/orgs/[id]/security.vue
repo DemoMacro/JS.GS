@@ -11,12 +11,12 @@ const { organization, loading } = useOrg(orgId);
 </script>
 
 <template>
-  <div v-if="loading" class="flex items-center justify-center h-64">
-    <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
+  <div v-if="loading" class="flex h-64 items-center justify-center">
+    <UIcon name="i-lucide-loader-2" class="size-8 animate-spin" />
   </div>
 
-  <div v-else-if="!organization" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">Organization not found</h3>
+  <div v-else-if="!organization" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Organization not found</h3>
     <p class="text-muted-foreground mb-4">
       The organization you're looking for doesn't exist or you don't have permission to view it.
     </p>

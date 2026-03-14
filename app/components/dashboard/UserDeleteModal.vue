@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { UserWithRole } from "better-auth/plugins";
 import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 const props = defineProps<{

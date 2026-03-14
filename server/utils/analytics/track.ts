@@ -1,13 +1,13 @@
+import { createGeoIPManager } from "geoip0";
+import type { GeoLocation } from "geoip0";
+import ipsbDriver from "geoip0/drivers/ipsb";
 import type { H3Event } from "h3";
 import { getRequestIP, getHeader } from "h3";
-import { UAParser } from "ua-parser-js";
+import { isValidIP, isPrivateIPv4, isPrivateIPv6, isLoopbackIPv4, isLoopbackIPv6 } from "ipdo";
 import { isbot } from "isbot";
-import { createGeoIPManager } from "geoip0";
-import ipsbDriver from "geoip0/drivers/ipsb";
+import { UAParser } from "ua-parser-js";
 import { chdbClient } from "~~/server/utils/database";
 import type { Link } from "~~/shared/types/link";
-import type { GeoLocation } from "geoip0";
-import { isValidIP, isPrivateIPv4, isPrivateIPv6, isLoopbackIPv4, isLoopbackIPv6 } from "ipdo";
 
 // GeoIP manager singleton
 const geoip = createGeoIPManager({ driver: ipsbDriver() });

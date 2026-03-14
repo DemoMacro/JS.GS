@@ -1,8 +1,8 @@
-import { createStorage, prefixStorage } from "unstorage";
-import redisDriver from "unstorage/drivers/redis";
-import memoryDriver from "unstorage/drivers/memory";
-import fsDriver from "unstorage/drivers/fs";
 import { isDevelopment, env } from "std-env";
+import { createStorage, prefixStorage } from "unstorage";
+import fsDriver from "unstorage/drivers/fs";
+import memoryDriver from "unstorage/drivers/memory";
+import redisDriver from "unstorage/drivers/redis";
 
 /**
  * Create storage instances with static drivers

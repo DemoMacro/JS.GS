@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Organization } from "better-auth/plugins";
 import type { DropdownMenuItem } from "@nuxt/ui";
+import type { Organization } from "better-auth/plugins";
+
 import { authClient } from "~/utils/auth";
 
 defineProps<{
@@ -37,68 +38,50 @@ const switching = ref(false);
 const currentEntity = computed(() => {
   const activeOrg = activeOrgResult.value.data;
   if (activeOrg) {
+    const isPersonal = activeOrg.slug?.startsWith("user_");
     return {
       label: activeOrg.name,
-      icon: "i-lucide-building",
-      type: "organization",
+      icon: isPersonal ? "i-lucide-user" : "i-lucide-building",
+      type: isPersonal ? "personal" : "organization",
     };
   }
   return {
-    label: "Personal",
-    icon: "i-lucide-user",
-    type: "personal",
+    label: "Select Organization",
+    icon: "i-lucide-users",
+    type: "none",
   };
 });
 
-// Switch between personal and organization
+// Switch between organizations
 async function switchContext(entityId: string) {
   if (switching.value) return;
 
   switching.value = true;
   try {
-    if (entityId === "personal") {
-      // Switch to personal mode
-      const { error } = await authClient.organization.setActive({
-        organizationId: null,
-      });
+    // Switch to organization mode
+    const { error } = await authClient.organization.setActive({
+      organizationId: entityId,
+    });
 
-      if (error) {
-        toast.add({
-          title: "Switch Failed",
-          description: error.message || "Failed to switch to personal account",
-          color: "error",
-        });
-        return;
-      }
-
+    if (error) {
       toast.add({
-        title: "Switched to Personal",
-        description: "You are now using your personal account",
-        color: "success",
+        title: "Switch Failed",
+        description: error.message || "Failed to switch to organization",
+        color: "error",
       });
-    } else {
-      // Switch to organization mode
-      const { error } = await authClient.organization.setActive({
-        organizationId: entityId,
-      });
-
-      if (error) {
-        toast.add({
-          title: "Switch Failed",
-          description: error.message || "Failed to switch to organization",
-          color: "error",
-        });
-        return;
-      }
-
-      const orgList = orgs.value;
-      const org = orgList?.find((o: Organization) => o.id === entityId);
-      toast.add({
-        title: "Switched to Organization",
-        description: `You are now working in ${org?.name || "the organization"}`,
-        color: "success",
-      });
+      return;
     }
+
+    const orgList = orgs.value;
+    const org = orgList?.find((o: Organization) => o.id === entityId);
+    const isPersonal = org?.slug?.startsWith("user_");
+    toast.add({
+      title: isPersonal ? "Personal Workspace" : "Switched to Organization",
+      description: isPersonal
+        ? "You are now in your personal workspace"
+        : `You are now working in ${org?.name || "the organization"}`,
+      color: "success",
+    });
 
     // useActiveOrganization hook will auto-update
     // useAsyncData with watch will auto-refetch organizations
@@ -115,24 +98,36 @@ async function switchContext(entityId: string) {
 
 // Build dropdown menu items
 const items = computed<DropdownMenuItem[][]>(() => {
-  const personalOption = {
-    label: "Personal",
-    icon: "i-lucide-user",
-    id: "personal",
-    onSelect: () => switchContext("personal"),
-  };
-
   const orgList = orgs.value;
-  const organizationOptions =
-    orgList?.map((org: Organization) => ({
+
+  // Separate personal and team organizations
+  const personalOrg = orgList?.find((org: Organization) => org.slug?.startsWith("user_"));
+  const teamOrgs = orgList?.filter((org: Organization) => !org.slug?.startsWith("user_")) || [];
+
+  const organizationOptions = [
+    // Personal organization at top
+    ...(personalOrg
+      ? [
+          {
+            label: personalOrg.name,
+            icon: "i-lucide-user",
+            id: personalOrg.id,
+            badge: "Personal",
+            onSelect: () => switchContext(personalOrg.id),
+          },
+        ]
+      : []),
+    // Team organizations
+    ...teamOrgs.map((org: Organization) => ({
       label: org.name,
       icon: "i-lucide-building",
       id: org.id,
       onSelect: () => switchContext(org.id),
-    })) || [];
+    })),
+  ];
 
   return [
-    [personalOption, ...organizationOptions],
+    organizationOptions,
     [
       {
         label: "Create organization",

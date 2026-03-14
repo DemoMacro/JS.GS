@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
@@ -130,8 +131,8 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 </script>
 
 <template>
-  <div v-if="!session?.user" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">Not authenticated</h3>
+  <div v-if="!session?.user" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Not authenticated</h3>
     <p class="text-muted-foreground mb-4">Please sign in to view your profile settings.</p>
     <UButton to="/auth/sign-in">Sign In</UButton>
   </div>
@@ -145,7 +146,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         orientation="horizontal"
         class="mb-4"
       >
-        <div class="flex gap-3 w-fit lg:ms-auto">
+        <div class="flex w-fit gap-3 lg:ms-auto">
           <UButton
             to="/dashboard/settings/security"
             label="Security Settings"
@@ -168,7 +169,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           label="Name"
           description="Will appear on receipts, invoices, and other communication."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="profile.name" autocomplete="off" />
         </UFormField>
@@ -177,7 +178,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           name="username"
           label="Username"
           description="Letters, numbers, hyphens and underscores only."
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="profile.username" autocomplete="off" />
         </UFormField>
@@ -187,7 +188,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           label="Email"
           description="Changing your email will require verification."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="profile.email" type="email" />
         </UFormField>
@@ -196,7 +197,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
           name="image"
           label="Avatar URL"
           description="URL to your profile image."
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="profile.image"

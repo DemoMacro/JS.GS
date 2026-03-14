@@ -98,14 +98,14 @@ async function handleRoleUpdate(memberId: string, newRole: string) {
 
       <!-- Loading State -->
       <div v-if="orgLoading || membersLoading" class="flex items-center justify-center py-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin size-6" />
+        <UIcon name="i-lucide-loader-2" class="size-6 animate-spin" />
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="members.length === 0" class="text-center py-8">
-        <UIcon name="i-lucide-users" class="size-12 text-muted mx-auto mb-4" />
-        <h3 class="text-lg font-semibold mb-2">No members found</h3>
-        <p class="text-sm text-muted">This organization doesn't have any members yet.</p>
+      <div v-else-if="members.length === 0" class="py-8 text-center">
+        <UIcon name="i-lucide-users" class="text-muted mx-auto mb-4 size-12" />
+        <h3 class="mb-2 text-lg font-semibold">No members found</h3>
+        <p class="text-muted text-sm">This organization doesn't have any members yet.</p>
       </div>
 
       <!-- Members List -->

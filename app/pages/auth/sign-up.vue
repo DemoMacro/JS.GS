@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
@@ -114,7 +115,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+  <div class="bg-background flex min-h-screen items-center justify-center px-4 py-12">
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
@@ -135,7 +136,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </template>
 
         <template #password-hint>
-          <p class="text-sm text-muted">Must be at least 8 characters</p>
+          <p class="text-muted text-sm">Must be at least 8 characters</p>
         </template>
 
         <template #validation>
@@ -143,7 +144,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         </template>
 
         <template #footer>
-          <p class="text-sm text-muted text-center">
+          <p class="text-muted text-center text-sm">
             By creating an account, you agree to our
             <ULink to="/terms" class="text-primary font-medium"> Terms of Service </ULink>
             and

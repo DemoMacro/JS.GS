@@ -1,4 +1,5 @@
 import type { Organization } from "better-auth/plugins";
+
 import { authClient } from "~/utils/auth";
 
 // Extended type for organization updates including additional operations

@@ -1,9 +1,10 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
-import { VerifyDomainSchema, type Domain } from "../../../../types/domain";
-import { canAccessDomain } from "../permissions";
 import { createDNSManager, isTxtRecord } from "undns";
 import dohDriver from "undns/drivers/doh";
+
+import { VerifyDomainSchema, type Domain } from "../../../../types/domain";
+import { canAccessDomain } from "../permissions";
 
 export const verifyDomain = () => {
   return createAuthEndpoint(

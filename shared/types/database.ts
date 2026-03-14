@@ -1,8 +1,9 @@
-import type { Session, Account, Verification } from "better-auth/types";
 import type { Organization, Member, Invitation, UserWithRole } from "better-auth/plugins";
+import type { Session, Account, Verification } from "better-auth/types";
 import type { Generated } from "kysely";
-import type { Link } from "./link";
+
 import type { Domain } from "./domain";
+import type { Link } from "./link";
 
 export interface User extends UserWithRole {
   username: string;

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
 import { getPaginationRowModel } from "@tanstack/table-core";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "API Keys - Dashboard - JS.GS",
 });
 
@@ -170,7 +170,7 @@ const columns: TableColumn<any>[] = [
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 flex-1">
+      <div class="flex flex-1 flex-col gap-4">
         <!-- Search and Controls -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <UInput
@@ -245,7 +245,7 @@ const columns: TableColumn<any>[] = [
             </template>
 
             <template #lastUsed-cell="{ row }">
-              <span v-if="!row.original.lastUsed" class="text-sm text-muted-foreground">
+              <span v-if="!row.original.lastUsed" class="text-muted-foreground text-sm">
                 Never
               </span>
               <span v-else class="text-sm">
@@ -274,8 +274,8 @@ const columns: TableColumn<any>[] = [
 
             <template #empty>
               <div class="flex flex-col items-center justify-center py-12 text-center">
-                <UIcon name="i-lucide-key" class="size-12 text-muted-foreground mb-4" />
-                <h3 class="text-lg font-semibold mb-2">No API Keys yet</h3>
+                <UIcon name="i-lucide-key" class="text-muted-foreground mb-4 size-12" />
+                <h3 class="mb-2 text-lg font-semibold">No API Keys yet</h3>
                 <p class="text-muted-foreground mb-4 max-w-md">
                   Create an API key to enable programmatic access to your account.
                 </p>
@@ -286,8 +286,8 @@ const columns: TableColumn<any>[] = [
         </div>
 
         <!-- Pagination Footer -->
-        <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-          <div class="text-sm text-muted-foreground">
+        <div class="border-default mt-auto flex items-center justify-between gap-3 border-t pt-4">
+          <div class="text-muted-foreground text-sm">
             Showing
             {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} of {{ total }} API keys
           </div>
@@ -303,7 +303,7 @@ const columns: TableColumn<any>[] = [
         </div>
 
         <!-- Info Section -->
-        <div class="border-t border-default pt-4">
+        <div class="border-default border-t pt-4">
           <UAlert icon="i-lucide-info" color="neutral" title="How to use API Keys">
             <template #description>
               <span class="inline"

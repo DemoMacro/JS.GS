@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Create User - Admin - JS.GS",
 });
 
@@ -96,7 +96,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
+      <div class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <UForm id="create-user" :schema="schema" :state="state" @submit="createUser">
           <UPageCard
             title="Create User"
@@ -105,7 +105,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
             orientation="horizontal"
             class="mb-4"
           >
-            <div class="flex gap-3 ms-auto">
+            <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/admin/users" :disabled="submitting"> Cancel </UButton>
               <UButton
                 form="create-user"
@@ -127,7 +127,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
               label="Email Address"
               description="The user's email address for login and communications."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.email"
@@ -143,7 +143,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
               label="Full Name"
               description="The user's display name."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.name"
@@ -158,7 +158,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
               label="Username"
               description="Unique username for the user."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.username"
@@ -173,7 +173,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
               label="Password"
               description="Initial password for the user account."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <div class="flex gap-2">
                 <UInput
@@ -192,7 +192,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
               label="Role"
               description="User role determines access permissions."
               required
-              class="flex max-sm:flex-col justify-between items-start gap-4"
+              class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <USelect
                 v-model="state.role"

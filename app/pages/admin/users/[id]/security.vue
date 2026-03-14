@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
 
 const route = useRoute();
 const userId = route.params.id as string;
@@ -246,12 +246,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="loading" class="flex items-center justify-center h-64">
-    <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
+  <div v-if="loading" class="flex h-64 items-center justify-center">
+    <UIcon name="i-lucide-loader-2" class="size-8 animate-spin" />
   </div>
 
-  <div v-else-if="!user" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">User not found</h3>
+  <div v-else-if="!user" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">User not found</h3>
     <p class="text-muted-foreground mb-4">
       The user you're looking for doesn't exist or you don't have permission to view it.
     </p>
@@ -275,7 +275,7 @@ onMounted(() => {
           label="New Password"
           description="Enter a new password for the user."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="passwordForm.newPassword" type="password" autocomplete="new-password" />
         </UFormField>
@@ -285,7 +285,7 @@ onMounted(() => {
           label="Confirm Password"
           description="Confirm the new password."
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.confirmPassword"
@@ -307,8 +307,8 @@ onMounted(() => {
       variant="subtle"
       class="mt-6"
     >
-      <div class="flex justify-between items-center mb-4">
-        <div class="text-sm text-muted-foreground">
+      <div class="mb-4 flex items-center justify-between">
+        <div class="text-muted-foreground text-sm">
           {{ sessions.filter((s) => getSessionStatus(s.expiresAt)).length }}
           active sessions
         </div>
@@ -318,18 +318,18 @@ onMounted(() => {
           @click="revokeAllSessions"
           :disabled="sessions.length === 0"
         >
-          <UIcon name="i-lucide-power" class="size-4 mr-2" />
+          <UIcon name="i-lucide-power" class="mr-2 size-4" />
           Revoke All
         </UButton>
       </div>
 
       <div v-if="sessionsLoading" class="flex items-center justify-center py-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin size-6" />
+        <UIcon name="i-lucide-loader-2" class="size-6 animate-spin" />
       </div>
 
-      <div v-else-if="sessions.length === 0" class="text-center py-8">
-        <UIcon name="i-lucide-key-round" class="size-12 text-muted-foreground mx-auto mb-4" />
-        <h3 class="text-lg font-semibold text-muted-foreground mb-2">No sessions found</h3>
+      <div v-else-if="sessions.length === 0" class="py-8 text-center">
+        <UIcon name="i-lucide-key-round" class="text-muted-foreground mx-auto mb-4 size-12" />
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">No sessions found</h3>
         <p class="text-muted-foreground">This user doesn't have any active sessions.</p>
       </div>
 
@@ -342,10 +342,10 @@ onMounted(() => {
         >
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <UIcon name="i-lucide-monitor" class="size-4 text-muted-foreground" />
+              <UIcon name="i-lucide-monitor" class="text-muted-foreground size-4" />
               <div>
-                <div class="font-medium text-sm">Session {{ session.id.slice(-8) }}</div>
-                <div class="text-xs text-muted-foreground">
+                <div class="text-sm font-medium">Session {{ session.id.slice(-8) }}</div>
+                <div class="text-muted-foreground text-xs">
                   Created: {{ formatDate(session.createdAt) }} • Expires:
                   {{ formatDate(session.expiresAt) }}
                 </div>
@@ -377,22 +377,22 @@ onMounted(() => {
     <UPageCard
       title="Account"
       description="Manage this user's account and access. Some actions cannot be undone."
-      class="bg-gradient-to-tl from-error/10 from-5% to-default mt-6"
+      class="from-error/10 to-default mt-6 bg-gradient-to-tl from-5%"
     >
       <div class="space-y-4">
         <!-- Ban Status and Actions -->
         <div
           v-if="user.banned"
-          class="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800"
+          class="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
         >
           <div class="flex items-start gap-3">
-            <UIcon name="i-lucide-alert-circle" class="size-5 text-red-500 mt-0.5" />
+            <UIcon name="i-lucide-alert-circle" class="mt-0.5 size-5 text-red-500" />
             <div class="flex-1">
               <p class="font-medium text-red-900 dark:text-red-100">User is banned</p>
-              <p v-if="user.banReason" class="text-sm text-red-700 dark:text-red-300 mt-1">
+              <p v-if="user.banReason" class="mt-1 text-sm text-red-700 dark:text-red-300">
                 Reason: {{ user.banReason }}
               </p>
-              <p v-if="user.banExpires" class="text-sm text-red-700 dark:text-red-300 mt-1">
+              <p v-if="user.banExpires" class="mt-1 text-sm text-red-700 dark:text-red-300">
                 Expires: {{ new Date(user.banExpires).toLocaleString() }}
               </p>
             </div>
@@ -457,10 +457,10 @@ onMounted(() => {
       <template #body>
         <div class="space-y-4">
           <div class="flex items-start gap-3">
-            <UIcon name="i-lucide-alert-triangle" class="size-5 text-red-500 mt-0.5" />
+            <UIcon name="i-lucide-alert-triangle" class="mt-0.5 size-5 text-red-500" />
             <div class="flex-1">
               <p class="font-medium text-red-900">Delete User Account</p>
-              <p class="text-sm text-muted-foreground mt-1">
+              <p class="text-muted-foreground mt-1 text-sm">
                 This action cannot be undone. This will permanently delete all data associated with
                 {{ user.name || user.email }}.
               </p>

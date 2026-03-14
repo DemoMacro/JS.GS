@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+
 import { authClient } from "~/utils/auth";
 
 defineProps<{

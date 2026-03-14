@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Domain } from "~~/shared/types/domain";
+
 import { authClient } from "~/utils/auth";
 
 const props = defineProps<{
@@ -107,18 +108,18 @@ async function verifyDomain() {
           <template #body>
             <div class="mt-4 space-y-3">
               <div class="flex items-start gap-3">
-                <span class="text-sm font-medium min-w-16">Type:</span>
+                <span class="min-w-16 text-sm font-medium">Type:</span>
                 <UBadge variant="subtle">TXT</UBadge>
               </div>
               <div class="flex items-start gap-3">
-                <span class="text-sm font-medium min-w-16">Host/Name:</span>
-                <span class="text-sm font-mono">@</span>
-                <span class="text-xs text-muted-foreground">(or {{ domain.domainName }})</span>
+                <span class="min-w-16 text-sm font-medium">Host/Name:</span>
+                <span class="font-mono text-sm">@</span>
+                <span class="text-muted-foreground text-xs">(or {{ domain.domainName }})</span>
               </div>
               <div class="flex items-start gap-3">
-                <span class="text-sm font-medium min-w-16">Value:</span>
-                <div class="flex items-center gap-2 flex-1">
-                  <span class="text-sm font-mono break-all">
+                <span class="min-w-16 text-sm font-medium">Value:</span>
+                <div class="flex flex-1 items-center gap-2">
+                  <span class="font-mono text-sm break-all">
                     {{ domain.verificationToken }}
                   </span>
                   <UButton

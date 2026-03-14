@@ -1,6 +1,6 @@
-import { z } from "zod";
-import type { IResult } from "ua-parser-js";
 import type { GeoLocation } from "geoip0";
+import type { IResult } from "ua-parser-js";
+import { z } from "zod";
 
 // Re-export types for convenience
 export type { IResult as IUAAResult, GeoLocation };

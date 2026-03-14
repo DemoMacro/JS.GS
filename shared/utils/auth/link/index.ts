@@ -1,10 +1,11 @@
 import type { BetterAuthPlugin } from "better-auth";
+
 import { createLink } from "./routes/create-link";
 import { deleteLink } from "./routes/delete-link";
 import { getAnalytics } from "./routes/get-analytics";
 import { getLink } from "./routes/get-link";
-import { listLinks } from "./routes/list-links";
 import { listEvents } from "./routes/list-events";
+import { listLinks } from "./routes/list-links";
 import { updateLink } from "./routes/update-link";
 
 export const link = () => {
@@ -32,7 +33,7 @@ export const link = () => {
             type: "string",
             required: true,
           },
-          userId: {
+          createdBy: {
             type: "string",
             required: false,
             references: {
@@ -40,6 +41,11 @@ export const link = () => {
               field: "id",
               onDelete: "set null",
             },
+            index: true,
+          },
+          updatedBy: {
+            type: "string",
+            required: false,
             index: true,
           },
           organizationId: {

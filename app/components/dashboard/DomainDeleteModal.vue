@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { Domain } from "~~/shared/types/domain";
 import * as z from "zod";
+import type { Domain } from "~~/shared/types/domain";
+
 import { authClient } from "~/utils/auth";
 
 const props = defineProps<{

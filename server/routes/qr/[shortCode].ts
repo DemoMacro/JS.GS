@@ -1,7 +1,7 @@
-import { db } from "~~/server/utils/database";
 import { renderSVG } from "uqr";
-import { getLink, setLink } from "~~/shared/utils/auth/link/cache";
+import { db } from "~~/server/utils/database";
 import type { Link } from "~~/shared/types/link";
+import { getLink, setLink } from "~~/shared/utils/auth/link/cache";
 
 export default defineEventHandler(async (event) => {
   const shortCode = getRouterParam(event, "shortCode");

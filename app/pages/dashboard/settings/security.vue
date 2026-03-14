@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
@@ -236,8 +237,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="!session?.user" class="text-center py-8">
-    <h3 class="text-lg font-semibold mb-2">Not authenticated</h3>
+  <div v-if="!session?.user" class="py-8 text-center">
+    <h3 class="mb-2 text-lg font-semibold">Not authenticated</h3>
     <p class="mb-4">Please sign in to view your security settings.</p>
     <UButton to="/auth/sign-in">Sign In</UButton>
   </div>
@@ -259,7 +260,7 @@ onMounted(() => {
           name="currentPassword"
           label="Current password"
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.currentPassword"
@@ -273,7 +274,7 @@ onMounted(() => {
           label="New password"
           description="Must be at least 8 characters"
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.newPassword"
@@ -287,7 +288,7 @@ onMounted(() => {
           label="Confirm password"
           description="Confirm your new password"
           required
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.confirmPassword"
@@ -300,7 +301,7 @@ onMounted(() => {
           name="revokeOtherSessions"
           label="Revoke other sessions"
           description="Sign out all other devices and browsers"
-          class="flex max-sm:flex-col justify-between items-start gap-4"
+          class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UCheckbox v-model="passwordForm.revokeOtherSessions" />
         </UFormField>
@@ -322,7 +323,7 @@ onMounted(() => {
     >
       <template #header>
         <div class="flex items-center justify-between gap-3">
-          <div class="text-sm text-muted">
+          <div class="text-muted text-sm">
             {{ sessions.filter((s) => getSessionStatus(s.expiresAt)).length }}
             active sessions
           </div>
@@ -332,7 +333,7 @@ onMounted(() => {
             @click="revokeAllOtherSessions"
             :disabled="sessions.length <= 1"
           >
-            <UIcon name="i-lucide-power" class="size-4 mr-2" />
+            <UIcon name="i-lucide-power" class="mr-2 size-4" />
             Revoke all other sessions
           </UButton>
         </div>
@@ -340,30 +341,30 @@ onMounted(() => {
 
       <!-- Loading State -->
       <div v-if="sessionsLoading" class="flex items-center justify-center py-8">
-        <UIcon name="i-lucide-loader-2" class="animate-spin size-6" />
+        <UIcon name="i-lucide-loader-2" class="size-6 animate-spin" />
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="sessions.length === 0" class="text-center py-8">
-        <UIcon name="i-lucide-key-round" class="size-12 text-muted mx-auto mb-4" />
-        <h3 class="text-lg font-semibold mb-2">No sessions found</h3>
-        <p class="text-sm text-muted">You don't have any active sessions.</p>
+      <div v-else-if="sessions.length === 0" class="py-8 text-center">
+        <UIcon name="i-lucide-key-round" class="text-muted mx-auto mb-4 size-12" />
+        <h3 class="mb-2 text-lg font-semibold">No sessions found</h3>
+        <p class="text-muted text-sm">You don't have any active sessions.</p>
       </div>
 
       <!-- Sessions List -->
-      <ul v-else role="list" class="divide-y divide-default">
+      <ul v-else role="list" class="divide-default divide-y">
         <li
           v-for="sessionItem in sessions"
           :key="sessionItem.token"
-          class="flex items-center justify-between gap-3 py-4 px-4 sm:px-6"
+          class="flex items-center justify-between gap-3 px-4 py-4 sm:px-6"
         >
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="size-10 bg-primary/10 rounded-full flex items-center justify-center">
+          <div class="flex min-w-0 items-center gap-3">
+            <div class="bg-primary/10 flex size-10 items-center justify-center rounded-full">
               <UIcon name="i-lucide-monitor" class="size-5" />
             </div>
 
-            <div class="text-sm min-w-0">
-              <p class="font-medium truncate">Session {{ sessionItem.token.slice(-8) }}</p>
+            <div class="min-w-0 text-sm">
+              <p class="truncate font-medium">Session {{ sessionItem.token.slice(-8) }}</p>
               <p class="text-muted truncate">
                 Created: {{ formatDate(sessionItem.createdAt) }} • Expires:
                 {{ formatDate(sessionItem.expiresAt) }}
@@ -396,7 +397,7 @@ onMounted(() => {
     <UPageCard
       title="Delete Account"
       description="Permanently delete your account and all associated data. This action is not reversible."
-      class="bg-linear-to-tl from-error/10 from-5% to-default"
+      class="from-error/10 to-default bg-linear-to-tl from-5%"
     >
       <template #footer>
         <UButton color="error" @click="deleteAccountModalOpen = true"> Delete account </UButton>

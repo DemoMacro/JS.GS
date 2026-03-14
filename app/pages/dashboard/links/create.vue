@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Create Link - Dashboard - JS.GS",
 });
 
@@ -23,7 +23,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const state = reactive<Partial<Schema>>({
-  organizationId: "personal",
+  organizationId: undefined,
   originalUrl: undefined,
   domainId: "default",
   title: undefined,
@@ -44,8 +44,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
       description: event.data.description || null,
       status: event.data.status || "active",
       expiresAt: event.data.expiresAt ? new Date(event.data.expiresAt) : null,
-      organizationId:
-        event.data.organizationId === "personal" ? undefined : event.data.organizationId,
+      organizationId: event.data.organizationId || null,
     });
 
     if (result.error) {
@@ -87,7 +86,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
     </template>
 
     <template #body>
-      <div class="w-full lg:max-w-2xl mx-auto">
+      <div class="mx-auto w-full lg:max-w-2xl">
         <UForm id="create-link" :schema="schema" :state="state" @submit="createLink">
           <UPageCard
             title="Create Short Link"
@@ -96,7 +95,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
             orientation="horizontal"
             class="mb-4"
           >
-            <div class="flex gap-3 ms-auto">
+            <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/dashboard/links" :disabled="submitting">
                 Cancel
               </UButton>

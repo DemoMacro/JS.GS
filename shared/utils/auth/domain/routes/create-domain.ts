@@ -1,5 +1,7 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
+import type { Organization } from "better-auth/plugins";
+
 import { CreateDomainSchema, type Domain } from "../../../../types/domain";
 
 const generateVerificationToken = (): string => {
@@ -34,7 +36,45 @@ export const createDomain = () => {
         });
       }
 
-      const { domainName, organizationId } = ctx.body;
+      let { domainName, organizationId } = ctx.body;
+
+      // For authenticated users without organization, auto-use/create personal organization
+      if (session?.user && !organizationId) {
+        const personalOrgSlug = `user_${session.user.id}`;
+
+        // Try to find existing personal organization
+        const personalOrg = await ctx.context.adapter.findOne<Organization>({
+          model: "organization",
+          where: [{ field: "slug", value: personalOrgSlug }],
+        });
+
+        if (personalOrg) {
+          organizationId = personalOrg.id;
+        } else {
+          // Create personal organization if it doesn't exist
+          const newOrg = await ctx.context.adapter.create<Organization>({
+            model: "organization",
+            data: {
+              name: `${session.user.name || session.user.username}'s Workspace`,
+              slug: personalOrgSlug,
+              createdAt: new Date(),
+            },
+          });
+
+          // Add user as owner
+          await ctx.context.adapter.create({
+            model: "member",
+            data: {
+              organizationId: newOrg.id,
+              userId: session.user.id,
+              role: "owner",
+              createdAt: new Date(),
+            },
+          });
+
+          organizationId = newOrg.id;
+        }
+      }
 
       // Check organization membership if provided
       if (organizationId) {
@@ -76,7 +116,8 @@ export const createDomain = () => {
 
       const newDomain = {
         domainName,
-        userId: session?.user?.id || null,
+        createdBy: session?.user?.id || null,
+        updatedBy: session?.user?.id || null,
         organizationId: organizationId || null,
         status: "pending" as const,
         verificationToken,

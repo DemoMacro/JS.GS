@@ -3,7 +3,6 @@ import type { TableColumn } from "@nuxt/ui";
 import { getPaginationRowModel } from "@tanstack/table-core";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Sessions - Admin - JS.GS",
 });
 
@@ -114,7 +113,7 @@ async function handleRevokeSession(session: any) {
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 flex-1">
+      <div class="flex flex-1 flex-col gap-4">
         <!-- Search and Controls -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <UInput
@@ -163,12 +162,12 @@ async function handleRevokeSession(session: any) {
           >
             <template #userEmail-cell="{ row }">
               <div class="flex items-center gap-2">
-                <div class="size-6 bg-primary/10 rounded-full flex items-center justify-center">
-                  <UIcon name="i-lucide-user" class="size-3 text-primary" />
+                <div class="bg-primary/10 flex size-6 items-center justify-center rounded-full">
+                  <UIcon name="i-lucide-user" class="text-primary size-3" />
                 </div>
                 <div>
                   <div class="font-medium">{{ row.getValue("userEmail") }}</div>
-                  <div class="text-xs text-muted-foreground">
+                  <div class="text-muted-foreground text-xs">
                     {{ row.original.userName || "—" }}
                   </div>
                 </div>
@@ -185,31 +184,31 @@ async function handleRevokeSession(session: any) {
             </template>
 
             <template #token-cell="{ row }">
-              <code class="text-xs bg-muted px-2 py-1 rounded">
+              <code class="bg-muted rounded px-2 py-1 text-xs">
                 {{ row.getValue("token") || "—" }}
               </code>
             </template>
 
             <template #ipAddress-cell="{ row }">
-              <span class="text-sm text-muted-foreground font-mono">
+              <span class="text-muted-foreground font-mono text-sm">
                 {{ row.getValue("ipAddress") || "—" }}
               </span>
             </template>
 
             <template #userAgent-cell="{ row }">
-              <span class="text-sm text-muted-foreground max-w-xs truncate block">
+              <span class="text-muted-foreground block max-w-xs truncate text-sm">
                 {{ row.getValue("userAgent") || "—" }}
               </span>
             </template>
 
             <template #createdAt-cell="{ row }">
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 {{ new Date(row.getValue("createdAt")).toLocaleDateString() }}
               </span>
             </template>
 
             <template #expiresAt-cell="{ row }">
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 {{ new Date(row.getValue("expiresAt")).toLocaleDateString() }}
               </span>
             </template>
@@ -239,8 +238,8 @@ async function handleRevokeSession(session: any) {
         </div>
 
         <!-- Pagination Footer -->
-        <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-          <div class="text-sm text-muted-foreground">
+        <div class="border-default mt-auto flex items-center justify-between gap-3 border-t pt-4">
+          <div class="text-muted-foreground text-sm">
             Showing {{ sessions.length }} of {{ total }} sessions
           </div>
 

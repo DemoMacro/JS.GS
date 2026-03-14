@@ -1,7 +1,8 @@
 import type { DBAdapter, GenericEndpointContext } from "better-auth";
-import type { Domain } from "../../../types/domain";
-import type { Member } from "better-auth/plugins";
 import { APIError } from "better-auth/api";
+import type { Member } from "better-auth/plugins";
+
+import type { Domain } from "../../../types/domain";
 
 type Session = {
   user: {
@@ -20,7 +21,7 @@ export async function canAccessDomain(
 
   // Personal domains (organizationId IS NULL) - only creator can operate
   if (!domain.organizationId) {
-    return domain.userId === session.user.id;
+    return domain.createdBy === session.user.id;
   }
 
   // Organization domains - check member role
@@ -41,7 +42,7 @@ export async function canAccessDomain(
 
   // Regular members can only operate domains they created
   if (member.role === "member") {
-    return domain.userId === session.user.id;
+    return domain.createdBy === session.user.id;
   }
 
   return false;
@@ -91,14 +92,14 @@ export async function buildDomainWhereConditions(params: {
     // Regular member can only see their own domains in the org
     return [
       { field: "organizationId", value: organizationId },
-      { field: "userId", value: userId },
+      { field: "createdBy", value: userId },
       ...(status ? [{ field: "status", value: status }] : []),
     ];
   }
 
-  // Personal mode - only show personal domains (userId matches AND orgId is null)
+  // Personal mode - only show personal domains (createdBy matches AND orgId is null)
   return [
-    { field: "userId", value: userId },
+    { field: "createdBy", value: userId },
     { field: "organizationId", value: null },
     ...(status ? [{ field: "status", value: status }] : []),
   ];

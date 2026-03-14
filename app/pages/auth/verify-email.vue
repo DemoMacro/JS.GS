@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
@@ -51,7 +52,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-background px-4 py-12">
+  <div class="bg-background flex min-h-screen items-center justify-center px-4 py-12">
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
@@ -74,7 +75,7 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         @submit="onSubmit"
       >
         <template #footer>
-          <div class="text-center text-sm text-muted">
+          <div class="text-muted text-center text-sm">
             <span>Already verified?</span>
             <ULink to="/auth/sign-in" class="text-primary font-medium"> Sign In </ULink>
           </div>

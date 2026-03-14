@@ -2,7 +2,6 @@
 import type { NavigationMenuItem } from "@nuxt/ui";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Organization Details - Admin - JS.GS",
 });
 
@@ -51,19 +50,19 @@ const links = [
     </template>
 
     <template #body>
-      <div v-if="loading" class="flex items-center justify-center h-64">
-        <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
+      <div v-if="loading" class="flex h-64 items-center justify-center">
+        <UIcon name="i-lucide-loader-2" class="size-8 animate-spin" />
       </div>
 
-      <div v-else-if="!organization" class="text-center py-8">
-        <h3 class="text-lg font-semibold text-muted-foreground mb-2">Organization not found</h3>
+      <div v-else-if="!organization" class="py-8 text-center">
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Organization not found</h3>
         <p class="text-muted-foreground mb-4">
           The organization you're looking for doesn't exist or you don't have permission to view it.
         </p>
         <UButton to="/admin/orgs">Back to Organizations</UButton>
       </div>
 
-      <div v-else class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
+      <div v-else class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <NuxtPage />
       </div>
     </template>

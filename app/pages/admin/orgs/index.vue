@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
-import type { Organization } from "better-auth/plugins";
 import { getPaginationRowModel } from "@tanstack/table-core";
+import type { Organization } from "better-auth/plugins";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Organizations - Admin - JS.GS",
 });
 
@@ -110,7 +110,7 @@ const columns: TableColumn<Organization>[] = [
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 flex-1">
+      <div class="flex flex-1 flex-col gap-4">
         <!-- Search and Controls -->
         <div class="flex flex-wrap items-center justify-between gap-4">
           <UInput
@@ -172,7 +172,7 @@ const columns: TableColumn<Organization>[] = [
             </template>
 
             <template #createdAt-cell="{ row }">
-              <span class="text-sm text-muted-foreground">
+              <span class="text-muted-foreground text-sm">
                 {{ new Date(row.getValue("createdAt")).toLocaleDateString() }}
               </span>
             </template>
@@ -218,8 +218,8 @@ const columns: TableColumn<Organization>[] = [
         </div>
 
         <!-- Pagination Footer -->
-        <div class="flex items-center justify-between gap-3 border-t border-default pt-4 mt-auto">
-          <div class="text-sm text-muted-foreground">
+        <div class="border-default mt-auto flex items-center justify-between gap-3 border-t pt-4">
+          <div class="text-muted-foreground text-sm">
             Showing {{ organizations.length }} of {{ total }} organizations
           </div>
 

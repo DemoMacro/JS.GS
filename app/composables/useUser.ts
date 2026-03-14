@@ -1,4 +1,5 @@
 import type { UserWithRole } from "better-auth/plugins/admin";
+
 import { authClient } from "~/utils/auth";
 
 // Extended type for user updates including password

@@ -1,5 +1,6 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
+
 import { LinkQuerySchema, type Link } from "../../../../types/link";
 import { canAccessLink } from "../permissions";
 

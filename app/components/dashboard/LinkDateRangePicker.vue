@@ -102,14 +102,14 @@ const selectRange = (range: { days?: number; months?: number; years?: number }) 
       <template #trailing>
         <UIcon
           name="i-lucide-chevron-down"
-          class="shrink-0 text-dimmed size-5 group-data-[state=open]:rotate-180 transition-transform duration-200"
+          class="text-dimmed size-5 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180"
         />
       </template>
     </UButton>
 
     <template #content>
-      <div class="flex items-stretch sm:divide-x divide-default">
-        <div class="hidden sm:flex flex-col justify-center">
+      <div class="divide-default flex items-stretch sm:divide-x">
+        <div class="hidden flex-col justify-center sm:flex">
           <UButton
             v-for="(range, index) in ranges"
             :key="index"

@@ -1,5 +1,5 @@
 import { defineNuxtConfig } from "nuxt/config";
-import { isProduction, env } from "std-env";
+import { env } from "std-env";
 
 export default defineNuxtConfig({
   future: {
@@ -7,10 +7,6 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: "2026-02-16",
-
-  typescript: {
-    typeCheck: !isProduction,
-  },
 
   routeRules: {
     "/api/**": {
@@ -37,6 +33,23 @@ export default defineNuxtConfig({
     cloudflare: {
       deployConfig: true,
       nodeCompat: true,
+    },
+  },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        "@vue/devtools-core",
+        "@vue/devtools-kit",
+        "better-auth/vue",
+        "better-auth/client/plugins",
+        "@better-auth/api-key/client",
+        "zod",
+        "@tanstack/table-core",
+        "@unovis/vue",
+        "date-fns",
+        "@internationalized/date",
+      ],
     },
   },
 

@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
 
 interface Props {
   schema: z.ZodObject<any>;
   state: Partial<Record<string, any>>;
   submitting?: boolean;
+  isPersonalOrg?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   submitting: false,
+  isPersonalOrg: false,
 });
 
 const emit = defineEmits<{
@@ -23,7 +25,7 @@ const emit = defineEmits<{
     label="Organization Name"
     description="The display name for your organization."
     required
-    class="flex max-sm:flex-col justify-between items-start gap-4"
+    class="flex items-start justify-between gap-4 max-sm:flex-col"
   >
     <UInput
       v-model="state.name"
@@ -38,15 +40,20 @@ const emit = defineEmits<{
   <UFormField
     name="slug"
     label="Slug"
-    description="Unique identifier used in URLs and API calls."
+    :description="
+      isPersonalOrg
+        ? 'Personal organization slug is managed automatically.'
+        : 'Unique identifier used in URLs and API calls.'
+    "
     required
-    class="flex max-sm:flex-col justify-between items-start gap-4"
+    class="flex items-start justify-between gap-4 max-sm:flex-col"
   >
     <UInput
       v-model="state.slug"
       placeholder="acme-corp"
       autocomplete="off"
-      :disabled="submitting"
+      :disabled="submitting || isPersonalOrg"
+      :hint="isPersonalOrg ? 'Managed automatically' : undefined"
     />
   </UFormField>
 
@@ -56,7 +63,7 @@ const emit = defineEmits<{
     name="logo"
     label="Logo URL"
     description="Organization logo image URL."
-    class="flex max-sm:flex-col justify-between items-start gap-4"
+    class="flex items-start justify-between gap-4 max-sm:flex-col"
   >
     <UInput
       v-model="state.logo"

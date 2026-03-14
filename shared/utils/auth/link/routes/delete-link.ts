@@ -1,9 +1,10 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
-import { LinkQuerySchema, type Link } from "../../../../types/link";
-import { canAccessLink } from "../permissions";
+
 import type { Domain } from "../../../../types/domain";
+import { LinkQuerySchema, type Link } from "../../../../types/link";
 import { removeLink } from "../cache";
+import { canAccessLink } from "../permissions";
 
 const deleteLinkBodySchema = LinkQuerySchema.pick({ linkId: true }).required();
 

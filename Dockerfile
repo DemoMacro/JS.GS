@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml .npmrc ./
 
 # use ignore-scripts to avoid running postinstall hooks
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy the entire project
 COPY . .

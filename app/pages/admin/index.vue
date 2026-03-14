@@ -81,7 +81,7 @@ const items = [
     </template>
 
     <template #body>
-      <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
+      <UPageGrid class="gap-4 sm:gap-6 lg:grid-cols-4 lg:gap-px">
         <UPageCard
           v-for="(stat, index) in stats"
           :key="index"
@@ -95,14 +95,14 @@ const items = [
             leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
             title: 'font-normal text-muted text-xs uppercase',
           }"
-          class="lg:rounded-none first:rounded-l-lg last:rounded-r-lg hover:z-1"
+          class="first:rounded-l-lg last:rounded-r-lg hover:z-1 lg:rounded-none"
         >
           <div v-if="loading" class="flex items-center gap-2">
-            <UIcon name="i-lucide-loader-2" class="animate-spin size-4 text-muted-foreground" />
+            <UIcon name="i-lucide-loader-2" class="text-muted-foreground size-4 animate-spin" />
             <span class="text-muted-foreground text-sm">Loading...</span>
           </div>
           <div v-else class="flex items-center gap-2">
-            <span class="text-2xl font-semibold text-highlighted">
+            <span class="text-highlighted text-2xl font-semibold">
               {{ stat.value.toLocaleString() }}
             </span>
 
@@ -120,10 +120,10 @@ const items = [
       <UPageCard>
         <template #header>
           <h3 class="text-lg font-semibold">Quick Actions</h3>
-          <p class="text-sm text-muted-foreground">Common administrative tasks</p>
+          <p class="text-muted-foreground text-sm">Common administrative tasks</p>
         </template>
 
-        <UPageGrid class="sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <UPageGrid class="gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <UButton to="/admin/users" variant="outline" class="justify-start">
             <UIcon name="i-lucide-users" class="mr-2" />
             Manage Users

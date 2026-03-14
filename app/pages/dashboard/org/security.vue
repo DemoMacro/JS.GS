@@ -58,18 +58,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-if="loading && !activeOrg" class="flex items-center justify-center h-64">
-    <UIcon name="i-lucide-loader-2" class="animate-spin size-8" />
+  <div v-if="loading && !activeOrg" class="flex h-64 items-center justify-center">
+    <UIcon name="i-lucide-loader-2" class="size-8 animate-spin" />
   </div>
 
-  <div v-else-if="error && !activeOrg" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">Error</h3>
+  <div v-else-if="error && !activeOrg" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Error</h3>
     <p class="text-muted-foreground mb-4">{{ error }}</p>
     <UButton @click="fetchOrganization">Retry</UButton>
   </div>
 
-  <div v-else-if="!activeOrg" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">No Active Organization</h3>
+  <div v-else-if="!activeOrg" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">No Active Organization</h3>
     <p class="text-muted-foreground mb-4">
       Please select an organization from the menu or create a new one.
     </p>

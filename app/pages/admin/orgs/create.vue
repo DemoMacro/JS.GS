@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
+
 import { authClient } from "~/utils/auth";
 
 definePageMeta({
-  layout: "dashboard",
   title: "Create Organization - Admin - JS.GS",
 });
 
@@ -16,7 +16,10 @@ const schema = z.object({
   slug: z
     .string()
     .min(4, "Slug is required")
-    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+    .regex(
+      /^[a-z0-9_-]+$/,
+      "Slug must contain only lowercase letters, numbers, hyphens, and underscores",
+    ),
   logo: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -123,7 +126,7 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
     </template>
 
     <template #body>
-      <div class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto">
+      <div class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <UForm
           id="create-organization"
           :schema="schema"
@@ -137,7 +140,7 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
             orientation="horizontal"
             class="mb-4"
           >
-            <div class="flex gap-3 ms-auto">
+            <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/admin/orgs" :disabled="submitting"> Cancel </UButton>
               <UButton
                 form="create-organization"

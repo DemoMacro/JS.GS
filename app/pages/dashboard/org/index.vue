@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from "zod";
 
 const toast = useToast();
 
@@ -11,13 +11,21 @@ const activeOrg = computed(() => activeOrgResult.value.data);
 const loading = ref(false);
 const error = ref<string | null>(null);
 
+// Check if current organization is a personal org
+const isPersonalOrg = computed(() => {
+  return activeOrg.value?.slug?.startsWith("user_") ?? false;
+});
+
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
   name: z.string().min(2, "Too short"),
   slug: z
     .string()
     .min(4, "Too short")
-    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+    .regex(
+      /^[a-z0-9_-]+$/,
+      "Slug must contain only lowercase letters, numbers, hyphens, and underscores",
+    ),
   logo: z.string().url("Invalid URL").optional().or(z.literal("")),
 });
 
@@ -39,12 +47,20 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
   loading.value = true;
   try {
+    // For personal organizations, don't include slug in update
+    const updateData = isPersonalOrg.value
+      ? {
+          name: event.data.name,
+          logo: event.data.logo || undefined,
+        }
+      : {
+          name: event.data.name,
+          slug: event.data.slug,
+          logo: event.data.logo || undefined,
+        };
+
     const { error: err } = await authClient.organization.update({
-      data: {
-        name: event.data.name,
-        slug: event.data.slug,
-        logo: event.data.logo || undefined,
-      },
+      data: updateData,
     });
 
     if (err) {
@@ -75,8 +91,8 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 </script>
 
 <template>
-  <div v-if="!activeOrg" class="text-center py-8">
-    <h3 class="text-lg font-semibold text-muted-foreground mb-2">Organization not found</h3>
+  <div v-if="!activeOrg" class="py-8 text-center">
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Organization not found</h3>
     <p class="text-muted-foreground mb-4">
       Please select an organization from the menu or create a new one.
     </p>
@@ -103,7 +119,12 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
       </UPageCard>
 
       <UPageCard variant="subtle">
-        <DashboardOrgForm :schema="profileSchema" :state="profile" :submitting="loading" />
+        <DashboardOrgForm
+          :schema="profileSchema"
+          :state="profile"
+          :submitting="loading"
+          :isPersonalOrg="isPersonalOrg"
+        />
       </UPageCard>
     </UForm>
   </div>

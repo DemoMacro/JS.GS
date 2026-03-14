@@ -1,4 +1,5 @@
 import type { BetterAuthPlugin } from "better-auth";
+
 import { createDomain } from "./routes/create-domain";
 import { deleteDomain } from "./routes/delete-domain";
 import { getDomain } from "./routes/get-domain";
@@ -18,7 +19,7 @@ export const domain = () => {
             unique: true,
             index: true,
           },
-          userId: {
+          createdBy: {
             type: "string",
             required: false,
             references: {
@@ -26,6 +27,11 @@ export const domain = () => {
               field: "id",
               onDelete: "set null",
             },
+            index: true,
+          },
+          updatedBy: {
+            type: "string",
+            required: false,
             index: true,
           },
           organizationId: {

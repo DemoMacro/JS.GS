@@ -1,10 +1,11 @@
-import { chdbClient, chdbConfig } from "../server/utils/database";
-import { getMigrations } from "better-auth/db/migration";
-import { authConfig } from "../server/utils/auth";
-import { db } from "../server/utils/database";
 import { createClient } from "@clickhouse/client-web";
-import { auth } from "../server/utils/auth";
+import { getMigrations } from "better-auth/db/migration";
 import { env } from "std-env";
+
+import { authConfig } from "../server/utils/auth";
+import { auth } from "../server/utils/auth";
+import { chdbClient, chdbConfig } from "../server/utils/database";
+import { db } from "../server/utils/database";
 
 export async function migrate() {
   console.log("🚀 Running database migration...");

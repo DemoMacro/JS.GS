@@ -1,5 +1,6 @@
 import { createAuthEndpoint, APIError } from "better-auth/api";
 import { getSessionFromCtx, sessionMiddleware } from "better-auth/api";
+
 import { DomainQuerySchema, type Domain } from "../../../../types/domain";
 import { canAccessDomain } from "../permissions";
 
