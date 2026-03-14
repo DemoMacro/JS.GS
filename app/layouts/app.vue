@@ -18,10 +18,10 @@ const items = computed<NavigationMenuItem[]>(() => {
       icon: "i-lucide-house",
     },
     {
-      label: "Dashboard",
-      to: "/dashboard",
-      active: route.path.startsWith("/dashboard"),
-      icon: "i-lucide-layout-dashboard",
+      label: "Pricing",
+      to: "/pricing",
+      active: route.path === "/pricing",
+      icon: "i-lucide-tag",
     },
     {
       label: "API Reference",

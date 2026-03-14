@@ -107,7 +107,6 @@ async function copyToClipboard() {
     <UPageHero
       title="Shorten Your Links"
       description="Transform long URLs into short, memorable links with powerful analytics and tracking."
-      align="center"
     >
       <template #default>
         <UContainer class="max-w-3xl">
