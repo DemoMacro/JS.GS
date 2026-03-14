@@ -68,16 +68,6 @@ async function handleSignOut() {
 }
 
 const items = computed<DropdownMenuItem[][]>(() => {
-  const adminNavigationItems = isAdmin.value
-    ? [
-        {
-          label: isInAdmin.value ? "Go to Dashboard" : "Go to Admin",
-          icon: isInAdmin.value ? "i-lucide-layout-dashboard" : "i-lucide-shield",
-          onSelect: isInAdmin.value ? navigateToDashboard : navigateToAdmin,
-        },
-      ]
-    : [];
-
   return [
     [
       {
@@ -90,7 +80,20 @@ const items = computed<DropdownMenuItem[][]>(() => {
       },
     ],
     [
-      ...adminNavigationItems,
+      {
+        label: isInAdmin.value ? "Go to Dashboard" : "Dashboard",
+        icon: "i-lucide-layout-dashboard",
+        onSelect: navigateToDashboard,
+      },
+      ...(isAdmin.value
+        ? [
+            {
+              label: "Admin",
+              icon: "i-lucide-shield",
+              onSelect: navigateToAdmin,
+            },
+          ]
+        : []),
       {
         label: "Profile",
         icon: "i-lucide-user",
