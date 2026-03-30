@@ -4,6 +4,8 @@ import type { Organization } from "better-auth/plugins";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 defineProps<{
   collapsed?: boolean;
 }>();
@@ -46,7 +48,7 @@ const currentEntity = computed(() => {
     };
   }
   return {
-    label: "Select Organization",
+    label: t("common.selectOrganization"),
     icon: "i-lucide-users",
     type: "none",
   };
@@ -65,8 +67,8 @@ async function switchContext(entityId: string) {
 
     if (error) {
       toast.add({
-        title: "Switch Failed",
-        description: error.message || "Failed to switch to organization",
+        title: t("common.failedToSwitchOrg"),
+        description: error.message || t("common.failedToSwitchOrg"),
         color: "error",
       });
       return;
@@ -76,10 +78,10 @@ async function switchContext(entityId: string) {
     const org = orgList?.find((o: Organization) => o.id === entityId);
     const isPersonal = org?.slug?.startsWith("user_");
     toast.add({
-      title: isPersonal ? "Personal Workspace" : "Switched to Organization",
+      title: isPersonal ? t("common.personalWorkspace") : t("common.switchedToOrg"),
       description: isPersonal
-        ? "You are now in your personal workspace"
-        : `You are now working in ${org?.name || "the organization"}`,
+        ? t("common.inPersonalWorkspace")
+        : t("common.nowInOrg", { name: org?.name || "..." }),
       color: "success",
     });
 
@@ -87,8 +89,8 @@ async function switchContext(entityId: string) {
     // useAsyncData with watch will auto-refetch organizations
   } catch (error) {
     toast.add({
-      title: "Switch Failed",
-      description: error instanceof Error ? error.message : "An error occurred",
+      title: t("common.failedToSwitchOrg"),
+      description: error instanceof Error ? error.message : t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -129,7 +131,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
     organizationOptions,
     [
       {
-        label: "Create organization",
+        label: t("dashboard.createOrg"),
         icon: "i-lucide-circle-plus",
         onSelect: () => navigateTo("/dashboard/create-org"),
       },

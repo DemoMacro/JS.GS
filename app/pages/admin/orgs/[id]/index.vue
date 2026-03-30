@@ -5,6 +5,7 @@ import * as z from "zod";
 const route = useRoute();
 const orgId = route.params.id as string;
 const toast = useToast();
+const { t } = useI18n();
 
 // Use composable for organization data
 const { organization, loading, updateOrg } = useOrg(orgId);
@@ -16,15 +17,12 @@ const isPersonalOrg = computed(() => {
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
-  name: z.string().min(2, "Too short"),
+  name: z.string().min(2, t("admin.tooShort")),
   slug: z
     .string()
-    .min(4, "Too short")
-    .regex(
-      /^[a-z0-9_-]+$/,
-      "Slug must contain only lowercase letters, numbers, hyphens, and underscores",
-    ),
-  logo: z.string().url("Invalid URL").optional().or(z.literal("")),
+    .min(4, t("admin.tooShort"))
+    .regex(/^[a-z0-9_-]+$/, t("dashboard.orgSlugFormat")),
+  logo: z.string().url(t("admin.invalidUrl")).optional().or(z.literal("")),
 });
 
 type ProfileSchema = z.output<typeof profileSchema>;
@@ -46,15 +44,15 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
   try {
     await updateOrg(event.data);
     toast.add({
-      title: "Success",
-      description: "Your settings have been updated.",
+      title: t("common.success"),
+      description: t("dashboard.orgUpdated"),
       icon: "i-lucide-check",
       color: "success",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to update organization",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("dashboard.failedToUpdateOrg"),
       color: "error",
     });
   }
@@ -67,25 +65,27 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
   </div>
 
   <div v-else-if="!organization" class="py-8 text-center">
-    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Organization not found</h3>
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">
+      {{ t("dashboard.orgNotFound") }}
+    </h3>
     <p class="text-muted-foreground mb-4">
-      The organization you're looking for doesn't exist or you don't have permission to view it.
+      {{ t("dashboard.orgNotFoundDesc") }}
     </p>
-    <UButton to="/admin/orgs">Back to Organizations</UButton>
+    <UButton to="/admin/orgs">{{ t("dashboard.backToOrgs") }}</UButton>
   </div>
 
   <div v-else>
     <UForm id="settings" :schema="profileSchema" :state="profile" @submit="onSubmit">
       <UPageCard
-        title="Profile"
-        description="These informations will be displayed publicly."
+        :title="t('dashboard.profile')"
+        :description="t('dashboard.profilePublicInfo')"
         variant="naked"
         orientation="horizontal"
         class="mb-4"
       >
         <UButton
           form="settings"
-          label="Save changes"
+          :label="t('dashboard.saveChanges')"
           color="neutral"
           type="submit"
           class="w-fit lg:ms-auto"

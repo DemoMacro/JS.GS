@@ -5,24 +5,25 @@ import * as z from "zod";
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
+const { t } = useI18n();
 const loading = ref(false);
 const emailSent = ref(false);
 
 definePageMeta({
-  title: "Forgot Password - JS.GS",
+  layout: "app",
 });
 
-const fields: AuthFormField[] = [
+const fields = computed<AuthFormField[]>(() => [
   {
     name: "email",
     type: "email",
-    label: "Email Address",
+    label: t("auth.emailAddress"),
     required: true,
   },
-];
+]);
 
 const schema = z.object({
-  email: z.email("Please enter a valid email address"),
+  email: z.email(t("auth.validEmailRequired")),
 });
 
 type Schema = z.output<typeof schema>;
@@ -37,8 +38,8 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to send reset email",
+        title: t("common.error"),
+        description: result.error.message || t("auth.failedToSendReset"),
         color: "error",
       });
       return;
@@ -46,14 +47,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
     emailSent.value = true;
     toast.add({
-      title: "Email Sent",
-      description: "If an account exists with this email, you will receive a password reset link",
+      title: t("auth.emailSent"),
+      description: t("auth.emailSentDesc"),
       color: "success",
     });
-  } catch (error) {
+  } catch {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -69,19 +70,21 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
         <UAuthForm
           :schema="schema"
           :fields="fields"
-          title="Forgot Password"
-          description="Enter your email address and we'll send you a link to reset your password"
+          :title="t('auth.forgotTitle')"
+          :description="t('auth.forgotDescription')"
           icon="i-lucide-mail"
           :submit="{
-            label: 'Send Reset Link',
+            label: t('auth.sendResetLink'),
             loading,
             block: true,
           }"
           @submit="onSubmit"
         >
           <template #description>
-            Remember your password?
-            <ULink to="/auth/sign-in" class="text-primary font-medium"> Sign in </ULink>
+            {{ t("auth.rememberPassword") }}
+            <ULink to="/auth/sign-in" class="text-primary font-medium">
+              {{ t("common.signIn") }}
+            </ULink>
           </template>
 
           <template #validation>
@@ -96,20 +99,26 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
             <UIcon name="i-lucide-mail-check" class="text-primary size-16" />
           </div>
           <div class="space-y-2">
-            <h2 class="text-2xl font-semibold">Check Your Email</h2>
+            <h2 class="text-2xl font-semibold">{{ t("auth.checkYourEmail") }}</h2>
             <p class="text-muted">
-              We've sent a password reset link to your email address. Please check your inbox and
-              spam folder.
+              {{ t("auth.checkYourEmailDesc") }}
             </p>
           </div>
           <div class="space-y-4">
             <p class="text-muted text-sm">
-              Didn't receive the email? Click the button below to resend.
+              {{ t("auth.notReceivedEmail") }}
             </p>
-            <UButton label="Resend Email" variant="outline" block @click="emailSent = false" />
+            <UButton
+              :label="t('auth.resendEmail')"
+              variant="outline"
+              block
+              @click="emailSent = false"
+            />
           </div>
           <div class="border-t pt-4">
-            <ULink to="/auth/sign-in" class="text-primary font-medium"> Back to Sign In </ULink>
+            <ULink to="/auth/sign-in" class="text-primary font-medium">
+              {{ t("auth.backToSignIn") }}
+            </ULink>
           </div>
         </div>
       </template>

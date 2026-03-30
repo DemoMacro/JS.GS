@@ -4,8 +4,10 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Create Domain - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
@@ -15,7 +17,7 @@ const activeOrgResult = authClient.useActiveOrganization();
 const activeOrg = computed(() => activeOrgResult.value.data);
 
 const schema = z.object({
-  domainName: z.string().min(1, "Please enter a domain name"),
+  domainName: z.string().min(1, t("dashboard.domainDesc")),
   organizationId: z.string().optional(),
 });
 
@@ -38,24 +40,24 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to create domain",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToCreateDomain"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: "Domain created successfully. Please verify ownership via DNS.",
+      title: t("common.success"),
+      description: t("dashboard.domainCreated"),
       color: "success",
     });
 
     await navigateTo("/dashboard/domains");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -67,7 +69,7 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
 <template>
   <UDashboardPanel id="create-domain">
     <template #header>
-      <UDashboardNavbar title="Create Domain">
+      <UDashboardNavbar :title="t('dashboard.createDomain')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -78,19 +80,19 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
       <div class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <UForm id="create-domain" :schema="schema" :state="state" @submit="createDomain">
           <UPageCard
-            title="Add Custom Domain"
-            description="Add a custom domain to use with your short links."
+            :title="t('dashboard.addCustomDomain')"
+            :description="t('dashboard.addCustomDomainDesc')"
             variant="naked"
             orientation="horizontal"
             class="mb-4"
           >
             <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/dashboard/domains" :disabled="submitting">
-                Cancel
+                {{ t("common.cancel") }}
               </UButton>
               <UButton
                 form="create-domain"
-                label="Create Domain"
+                :label="t('dashboard.createDomain')"
                 color="primary"
                 type="submit"
                 :loading="submitting"
@@ -105,14 +107,14 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
           <UPageCard variant="subtle">
             <UFormField
               name="domainName"
-              label="Domain Name"
-              description="The domain you want to use (e.g., example.com)."
+              :label="t('dashboard.domainName')"
+              :description="t('dashboard.domainDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.domainName"
-                placeholder="example.com"
+                :placeholder="t('dashboard.domainPlaceholder')"
                 :disabled="submitting"
                 class="w-full"
               />
@@ -122,16 +124,16 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
 
             <UFormField
               name="organizationId"
-              label="Organization"
+              :label="t('dashboard.org')"
               :description="
                 activeOrg
-                  ? `Creating for: ${activeOrg.name}`
-                  : 'Select an organization to create this domain'
+                  ? t('dashboard.creatingFor', { name: activeOrg.name })
+                  : t('dashboard.selectOrgForDomain')
               "
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
-                :model-value="activeOrg?.name || 'No organization selected'"
+                :model-value="activeOrg?.name || t('dashboard.selectOrgForDomain')"
                 disabled
                 class="w-full"
               />
@@ -139,10 +141,9 @@ async function createDomain(event: FormSubmitEvent<Schema>) {
 
             <USeparator />
 
-            <p class="text-sm font-medium">⚠️ DNS Verification Required</p>
+            <p class="text-sm font-medium">{{ t("dashboard.dnsWarning") }}</p>
             <p class="text-muted-foreground text-sm">
-              After creating this domain, you'll need to verify ownership by adding a TXT record to
-              your domain's DNS configuration.
+              {{ t("dashboard.dnsWarningDesc") }}
             </p>
           </UPageCard>
         </UForm>

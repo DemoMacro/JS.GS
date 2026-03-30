@@ -7,8 +7,10 @@ import { useDomains } from "~/composables/useDomains";
 import { useOrganizations } from "~/composables/useOrganizations";
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Domains - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const table = useTemplateRef("table");
@@ -43,14 +45,14 @@ async function copyToClipboard(token: string) {
   try {
     await navigator.clipboard.writeText(token);
     toast.add({
-      title: "Success",
-      description: "Verification token copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.verificationTokenCopied"),
       color: "success",
     });
   } catch {
     toast.add({
-      title: "Error",
-      description: "Failed to copy token",
+      title: t("common.error"),
+      description: t("dashboard.failedToCopyToken"),
       color: "error",
     });
   }
@@ -88,8 +90,8 @@ const {
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch domains",
+      title: t("common.error"),
+      description: newError.message || "Failed to fetch domains",
       color: "error",
     });
   }
@@ -98,27 +100,35 @@ watch(error, (newError) => {
 const columns: TableColumn<Domain>[] = [
   {
     accessorKey: "domainName",
-    header: "Domain Name",
+    header: () => t("dashboard.domainName"),
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: () => t("common.status"),
   },
   {
     accessorKey: "verifiedAt",
-    header: "Verified",
+    header: () => t("common.verified"),
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: () => t("common.actions"),
   },
 ];
+
+// Pagination items
+const paginationItems = computed(() => [
+  { label: t("dashboard.perPage", { count: 10 }), value: 10 },
+  { label: t("dashboard.perPage", { count: 25 }), value: 25 },
+  { label: t("dashboard.perPage", { count: 50 }), value: 50 },
+  { label: t("dashboard.perPage", { count: 100 }), value: 100 },
+]);
 </script>
 
 <template>
   <UDashboardPanel id="domains">
     <template #header>
-      <UDashboardNavbar title="Domains">
+      <UDashboardNavbar :title="t('dashboard.domains')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -133,26 +143,17 @@ const columns: TableColumn<Domain>[] = [
             v-model="globalFilter"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Search by domain name..."
+            :placeholder="t('dashboard.searchDomain')"
           />
 
           <div class="flex flex-wrap items-center gap-2">
-            <UButton to="/dashboard/domains/create" label="Add Domain">
+            <UButton to="/dashboard/domains/create" :label="t('dashboard.addDomain')">
               <template #leading>
                 <UIcon name="i-lucide-plus" />
               </template>
             </UButton>
 
-            <USelect
-              v-model="pagination.pageSize"
-              :items="[
-                { label: '10 per page', value: 10 },
-                { label: '25 per page', value: 25 },
-                { label: '50 per page', value: 50 },
-                { label: '100 per page', value: 100 },
-              ]"
-              class="min-w-32"
-            />
+            <USelect v-model="pagination.pageSize" :items="paginationItems" class="min-w-32" />
           </div>
         </div>
 
@@ -195,7 +196,13 @@ const columns: TableColumn<Domain>[] = [
                 "
                 variant="subtle"
               >
-                {{ row.getValue("status") }}
+                {{
+                  row.getValue("status") === "active"
+                    ? t("common.active")
+                    : row.getValue("status") === "inactive"
+                      ? t("common.inactive")
+                      : t("common.pending")
+                }}
               </UBadge>
             </template>
 
@@ -204,7 +211,7 @@ const columns: TableColumn<Domain>[] = [
                 {{
                   (row.original as Domain).verifiedAt
                     ? new Date((row.original as Domain).verifiedAt as Date).toLocaleDateString()
-                    : "Not verified"
+                    : t("common.notVerified")
                 }}
               </span>
             </template>
@@ -214,19 +221,23 @@ const columns: TableColumn<Domain>[] = [
                 <UButton
                   variant="ghost"
                   icon="i-lucide-copy"
-                  title="Copy Verification Token"
+                  :title="t('dashboard.copyVerificationToken')"
                   :disabled="!row.original.verificationToken"
                   @click="copyToClipboard((row.original as Domain).verificationToken || '')"
                 />
 
                 <UPopover v-if="row.original.verificationToken">
-                  <UButton variant="ghost" icon="i-lucide-info" title="Verification Info" />
+                  <UButton
+                    variant="ghost"
+                    icon="i-lucide-info"
+                    :title="t('dashboard.verificationInfo')"
+                  />
 
                   <template #content>
                     <div class="max-w-sm p-4">
-                      <p class="mb-2 text-sm font-medium">DNS Verification</p>
+                      <p class="mb-2 text-sm font-medium">{{ t("dashboard.dnsVerification") }}</p>
                       <p class="text-muted-foreground mb-2 text-sm">
-                        Add this TXT record to your domain's DNS configuration:
+                        {{ t("dashboard.dnsRecordInstruction") }}
                       </p>
                       <div class="bg-muted space-y-1 rounded p-3">
                         <div class="flex items-center gap-2">
@@ -256,7 +267,11 @@ const columns: TableColumn<Domain>[] = [
                   :domain="row.original"
                   @refresh="fetchDomains"
                 >
-                  <UButton variant="ghost" icon="i-lucide-refresh-cw" title="Verify Domain" />
+                  <UButton
+                    variant="ghost"
+                    icon="i-lucide-refresh-cw"
+                    :title="t('dashboard.verifyDomain')"
+                  />
                 </DashboardDomainVerifyModal>
 
                 <DashboardDomainDeleteModal :domain="row.original" @refresh="fetchDomains">
@@ -264,7 +279,7 @@ const columns: TableColumn<Domain>[] = [
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
-                    title="Delete Domain"
+                    :title="t('dashboard.deleteDomain')"
                   />
                 </DashboardDomainDeleteModal>
               </div>

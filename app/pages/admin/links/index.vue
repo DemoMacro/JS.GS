@@ -1,6 +1,8 @@
 <script setup lang="ts">
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Links - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
@@ -14,7 +16,7 @@ const emit = defineEmits<{
 <template>
   <UDashboardPanel id="admin-links">
     <template #header>
-      <UDashboardNavbar title="Links">
+      <UDashboardNavbar :title="t('admin.links')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

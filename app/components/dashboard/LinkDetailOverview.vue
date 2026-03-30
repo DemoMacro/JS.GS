@@ -2,6 +2,8 @@
 import { VisXYContainer, VisLine, VisArea, VisAxis, VisCrosshair, VisTooltip } from "@unovis/vue";
 import { format } from "date-fns";
 
+const { t } = useI18n();
+
 interface Range {
   start: Date;
   end: Date;
@@ -103,6 +105,8 @@ const template = (d: DataRecord) =>
 const getPercentage = (item: AnalyticsRecord) => {
   return totalClicks.value > 0 ? Math.round((Number(item.clicks) / totalClicks.value) * 100) : 0;
 };
+
+const granularityItems = ["hour", "day", "week", "month"];
 </script>
 
 <template>
@@ -111,7 +115,7 @@ const getPercentage = (item: AnalyticsRecord) => {
     <UPageGrid class="gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <UPageCard
         icon="i-lucide-mouse-pointer-click"
-        title="Total"
+        :title="t('dashboard.total')"
         :ui="{
           container: 'gap-y-1.5',
           wrapper: 'items-start',
@@ -128,7 +132,7 @@ const getPercentage = (item: AnalyticsRecord) => {
 
       <UPageCard
         icon="i-lucide-users"
-        title="Unique Visitors"
+        :title="t('dashboard.uniqueVisitors')"
         :ui="{
           container: 'gap-y-1.5',
           wrapper: 'items-start',
@@ -145,7 +149,7 @@ const getPercentage = (item: AnalyticsRecord) => {
 
       <UPageCard
         icon="i-lucide-smartphone"
-        title="Mobile Percentage"
+        :title="t('dashboard.mobilePercentage')"
         :ui="{
           container: 'gap-y-1.5',
           wrapper: 'items-start',
@@ -160,7 +164,7 @@ const getPercentage = (item: AnalyticsRecord) => {
 
       <UPageCard
         icon="i-lucide-globe"
-        title="Top Country"
+        :title="t('dashboard.topCountry')"
         :ui="{
           container: 'gap-y-1.5',
           wrapper: 'items-start',
@@ -181,17 +185,12 @@ const getPercentage = (item: AnalyticsRecord) => {
       <template #header>
         <div class="flex items-center justify-between gap-4">
           <div>
-            <h3 class="text-lg font-semibold">Click Trend</h3>
-            <p class="text-muted-foreground text-sm">Clicks over time</p>
+            <h3 class="text-lg font-semibold">{{ t("dashboard.clickTrend") }}</h3>
+            <p class="text-muted-foreground text-sm">{{ t("dashboard.clicksOverTime") }}</p>
           </div>
 
           <!-- Time Granularity Selector -->
-          <USelectMenu
-            v-model="timeGranularity"
-            :items="['hour', 'day', 'week', 'month']"
-            size="sm"
-            class="w-32"
-          />
+          <USelectMenu v-model="timeGranularity" :items="granularityItems" size="sm" class="w-32" />
         </div>
       </template>
 
@@ -214,7 +213,7 @@ const getPercentage = (item: AnalyticsRecord) => {
       </VisXYContainer>
 
       <div v-else class="text-muted-foreground flex h-96 items-center justify-center">
-        <p>No data available</p>
+        <p>{{ t("common.noData") }}</p>
       </div>
     </UCard>
 
@@ -223,7 +222,7 @@ const getPercentage = (item: AnalyticsRecord) => {
       <!-- Left: Countries -->
       <UCard>
         <template #header>
-          <h3 class="text-lg font-semibold">Geographic Distribution (Top 5)</h3>
+          <h3 class="text-lg font-semibold">{{ t("dashboard.geoDistribution") }}</h3>
         </template>
 
         <div v-if="loading" class="flex items-center justify-center py-12">
@@ -238,7 +237,9 @@ const getPercentage = (item: AnalyticsRecord) => {
           >
             <div class="flex-1">
               <div class="mb-1 flex items-center justify-between">
-                <span class="text-sm font-medium">{{ country.country || "Unknown" }}</span>
+                <span class="text-sm font-medium">{{
+                  country.country || t("common.unknown")
+                }}</span>
                 <span class="text-muted-foreground text-sm">{{
                   formatNumber(Number(country.clicks))
                 }}</span>
@@ -254,7 +255,7 @@ const getPercentage = (item: AnalyticsRecord) => {
         </div>
 
         <div v-else class="text-muted-foreground flex items-center justify-center py-12">
-          <p>No data available</p>
+          <p>{{ t("common.noData") }}</p>
         </div>
       </UCard>
 
@@ -262,42 +263,42 @@ const getPercentage = (item: AnalyticsRecord) => {
       <UCard>
         <template #header>
           <div class="flex items-center justify-between gap-4">
-            <h3 class="text-lg font-semibold">Dimension Analysis</h3>
+            <h3 class="text-lg font-semibold">{{ t("dashboard.dimensionAnalysis") }}</h3>
 
             <UFieldGroup>
               <UButton
                 :variant="activeTab === 'devices' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-smartphone"
-                title="Devices"
+                :title="t('dashboard.devices')"
                 @click="setTab('devices')"
               />
               <UButton
                 :variant="activeTab === 'browsers' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-globe"
-                title="Browsers"
+                :title="t('dashboard.browsers')"
                 @click="setTab('browsers')"
               />
               <UButton
                 :variant="activeTab === 'os' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-monitor"
-                title="Operating Systems"
+                :title="t('dashboard.operatingSystems')"
                 @click="setTab('os')"
               />
               <UButton
                 :variant="activeTab === 'referers' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-link-2"
-                title="Referers"
+                :title="t('dashboard.referers')"
                 @click="setTab('referers')"
               />
               <UButton
                 :variant="activeTab === 'utm_sources' ? 'solid' : 'outline'"
                 size="sm"
                 icon="i-lucide-tag"
-                title="UTM Sources"
+                :title="t('dashboard.utmSources')"
                 @click="setTab('utm_sources')"
               />
             </UFieldGroup>
@@ -317,7 +318,7 @@ const getPercentage = (item: AnalyticsRecord) => {
             <div class="flex-1">
               <div class="mb-1 flex items-center justify-between">
                 <span class="flex-1 truncate text-sm font-medium">
-                  {{ String(item[activeTabKey] || "Unknown") }}
+                  {{ String(item[activeTabKey] || t("common.unknown")) }}
                 </span>
                 <span class="text-muted-foreground ml-2 text-sm">
                   {{ formatNumber(Number(item.clicks)) }}
@@ -334,7 +335,7 @@ const getPercentage = (item: AnalyticsRecord) => {
         </div>
 
         <div v-else class="text-muted-foreground flex items-center justify-center py-12">
-          <p>No data available</p>
+          <p>{{ t("common.noData") }}</p>
         </div>
       </UCard>
     </UPageGrid>

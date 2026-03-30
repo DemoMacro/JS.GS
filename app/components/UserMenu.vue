@@ -3,6 +3,8 @@ import type { DropdownMenuItem } from "@nuxt/ui";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 defineProps<{
   collapsed?: boolean;
 }>();
@@ -41,8 +43,8 @@ async function handleSignOut() {
 
     if (error) {
       toast.add({
-        title: "Sign Out Error",
-        description: error.message || "Failed to sign out",
+        title: t("common.signOutError"),
+        description: error.message || t("common.failedToSignOut"),
         color: "error",
       });
       return;
@@ -52,16 +54,16 @@ async function handleSignOut() {
     await authClient.getSession();
 
     toast.add({
-      title: "Signed Out",
-      description: "You have been successfully signed out",
+      title: t("common.signedOut"),
+      description: t("common.signedOutDesc"),
       color: "success",
     });
 
     await navigateTo("/");
   } catch (error) {
     toast.add({
-      title: "Sign Out Error",
-      description: "An error occurred while signing out",
+      title: t("common.signOutError"),
+      description: t("common.signOutErrorDesc"),
       color: "error",
     });
   }
@@ -81,43 +83,43 @@ const items = computed<DropdownMenuItem[][]>(() => {
     ],
     [
       {
-        label: isInAdmin.value ? "Go to Dashboard" : "Dashboard",
+        label: isInAdmin.value ? t("common.goToDashboard") : t("dashboard.title"),
         icon: "i-lucide-layout-dashboard",
         onSelect: navigateToDashboard,
       },
       ...(isAdmin.value
         ? [
             {
-              label: "Admin",
+              label: t("admin.title"),
               icon: "i-lucide-shield",
               onSelect: navigateToAdmin,
             },
           ]
         : []),
       {
-        label: "Profile",
+        label: t("dashboard.profile"),
         icon: "i-lucide-user",
         onSelect: () => navigateTo("/dashboard/settings"),
       },
       {
-        label: "Security",
+        label: t("common.security"),
         icon: "i-lucide-shield",
         onSelect: () => navigateTo("/dashboard/settings/security"),
       },
       {
-        label: "Invitations",
+        label: t("dashboard.invitations"),
         icon: "i-lucide-mail",
         onSelect: () => navigateTo("/dashboard/settings/invitations"),
       },
       {
-        label: "API Keys",
+        label: t("dashboard.apiKeys"),
         icon: "i-lucide-key",
         onSelect: () => navigateTo("/dashboard/apikeys"),
       },
     ],
     [
       {
-        label: "Sign Out",
+        label: t("common.signOut"),
         icon: "i-lucide-log-out",
         color: "error",
         onSelect: handleSignOut,

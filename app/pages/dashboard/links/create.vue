@@ -4,15 +4,17 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Create Link - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
 
 const schema = z.object({
   organizationId: z.string().optional(),
-  originalUrl: z.string().url("Please enter a valid URL"),
+  originalUrl: z.string().url(t("home.validUrlRequired")),
   domainId: z.string().optional(),
   title: z.string().max(200).optional(),
   description: z.string().max(500).optional(),
@@ -49,24 +51,24 @@ async function createLink(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to create link",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToCreateLink"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: "Link created successfully",
+      title: t("common.success"),
+      description: t("dashboard.linkCreated"),
       color: "success",
     });
 
     await navigateTo("/dashboard/links");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -78,7 +80,7 @@ async function createLink(event: FormSubmitEvent<Schema>) {
 <template>
   <UDashboardPanel id="create-link">
     <template #header>
-      <UDashboardNavbar title="Create Link">
+      <UDashboardNavbar :title="t('dashboard.createShortLink')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -89,17 +91,22 @@ async function createLink(event: FormSubmitEvent<Schema>) {
       <div class="mx-auto w-full lg:max-w-2xl">
         <UForm id="create-link" :schema="schema" :state="state" @submit="createLink">
           <UPageCard
-            title="Create Short Link"
-            description="Create a new short link to track and manage your URLs."
+            :title="t('dashboard.createShortLink')"
+            :description="t('dashboard.createShortLinkDesc')"
             variant="naked"
             orientation="horizontal"
             class="mb-4"
           >
             <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/dashboard/links" :disabled="submitting">
-                Cancel
+                {{ t("common.cancel") }}
               </UButton>
-              <UButton label="Create Link" color="primary" type="submit" :loading="submitting">
+              <UButton
+                :label="t('dashboard.createLink')"
+                color="primary"
+                type="submit"
+                :loading="submitting"
+              >
                 <template #leading>
                   <UIcon name="i-lucide-plus" />
                 </template>

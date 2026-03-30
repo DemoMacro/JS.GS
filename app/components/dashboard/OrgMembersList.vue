@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 
+const { t } = useI18n();
+
 interface Props {
   members: Array<{
     id: string;
@@ -31,10 +33,16 @@ const emit = defineEmits<{
 
 const items = computed<DropdownMenuItem[]>(() => [
   {
-    label: "Remove member",
+    label: t("dashboard.removeMember"),
     color: "error" as const,
     onSelect: () => {},
   },
+]);
+
+const roleItems = computed(() => [
+  { label: t("common.member"), value: "member" },
+  { label: t("common.admin"), value: "admin" },
+  { label: t("common.owner"), value: "owner" },
 ]);
 </script>
 
@@ -63,7 +71,7 @@ const items = computed<DropdownMenuItem[]>(() => [
       <div class="flex items-center gap-3">
         <USelect
           :model-value="member.role"
-          :items="['member', 'admin', 'owner']"
+          :items="roleItems"
           color="neutral"
           :disabled="!canUpdateRole"
           :ui="{ value: 'capitalize', item: 'capitalize' }"

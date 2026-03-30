@@ -2,6 +2,8 @@
 import type { Organization } from "better-auth/plugins";
 import * as z from "zod";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   organization: Organization | null;
 }>();
@@ -11,22 +13,22 @@ const toast = useToast();
 const open = ref(false);
 const loading = ref(false);
 
+// Check if this is a personal organization
+const isPersonalOrg = computed(() => {
+  return props.organization?.slug?.startsWith("user_") ?? false;
+});
+
 // Watch modal open state to show toast for personal orgs
 watch(open, (isOpen) => {
   if (isOpen && isPersonalOrg.value) {
     toast.add({
-      title: "Cannot Delete Personal Organization",
-      description: "Personal organizations are automatically managed and cannot be deleted.",
+      title: t("dashboard.cannotDeletePersonalOrg"),
+      description: t("dashboard.cannotDeletePersonalOrgDesc"),
       color: "error",
     });
     // Immediately close the modal
     open.value = false;
   }
-});
-
-// Check if this is a personal organization
-const isPersonalOrg = computed(() => {
-  return props.organization?.slug?.startsWith("user_") ?? false;
 });
 
 const emit = defineEmits<{
@@ -36,7 +38,7 @@ const emit = defineEmits<{
 // Form schema
 const schema = z.object({
   confirmText: z.string().refine((val) => val === props.organization?.name, {
-    message: "Please enter the exact organization name to confirm deletion",
+    message: t("dashboard.enterOrgNameConfirm"),
   }),
 });
 
@@ -50,8 +52,8 @@ const state = reactive<Partial<Schema>>({
 async function deleteOrganization() {
   if (!props.organization?.id) {
     toast.add({
-      title: "Error",
-      description: "Organization ID is required for deletion",
+      title: t("common.error"),
+      description: t("dashboard.orgIdRequired"),
       color: "error",
     });
     return;
@@ -65,16 +67,16 @@ async function deleteOrganization() {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to delete organization",
+        title: t("common.error"),
+        description: result.error.message || t("admin.failedToCreateOrg"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `Organization ${props.organization.name} has been deleted successfully`,
+      title: t("common.success"),
+      description: t("dashboard.orgDeleted", { name: props.organization.name }),
       color: "success",
     });
 
@@ -85,8 +87,8 @@ async function deleteOrganization() {
     state.confirmText = "";
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred while deleting organization",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -98,23 +100,18 @@ async function deleteOrganization() {
 <template>
   <UModal
     v-model:open="open"
-    title="Delete Organization"
-    description="Confirm the permanent deletion of this organization"
+    :title="t('admin.deleteOrganization')"
+    :description="t('dashboard.confirmDeleteOrgDesc')"
   >
     <slot />
 
     <template #body>
       <div class="space-y-4">
-        <p class="text-muted-foreground">
-          This action cannot be undone. This will permanently delete the organization and remove all
-          organization data, members, and settings.
-        </p>
-
         <UForm :schema="schema" :state="state" class="space-y-4" @submit="deleteOrganization">
           <UFormField
             name="confirmText"
-            :label="`Type '${props.organization?.name}' to confirm deletion`"
-            description="Please enter the exact organization name to confirm you want to delete this organization"
+            :label="t('common.typeToConfirm', { name: props.organization?.name })"
+            :description="t('dashboard.enterOrgNameConfirm')"
           >
             <UInput
               v-model="state.confirmText"
@@ -125,14 +122,16 @@ async function deleteOrganization() {
           </UFormField>
 
           <div class="flex justify-end gap-2">
-            <UButton variant="outline" @click="open = false" :disabled="loading"> Cancel </UButton>
+            <UButton variant="outline" @click="open = false" :disabled="loading">
+              {{ t("common.cancel") }}
+            </UButton>
             <UButton
               color="error"
               type="submit"
               :loading="loading"
               :disabled="state.confirmText !== props.organization?.name"
             >
-              Delete Organization
+              {{ t("admin.deleteOrganization") }}
             </UButton>
           </div>
         </UForm>

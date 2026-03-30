@@ -4,8 +4,10 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Security Settings - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
@@ -16,13 +18,13 @@ const { data: session } = await authClient.useSession(useFetch);
 // Password change schema
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(1, "Please confirm your password"),
+    currentPassword: z.string().min(1, t("dashboard.enterCurrentPassword")),
+    newPassword: z.string().min(8, t("dashboard.passwordMin8")),
+    confirmPassword: z.string().min(1, t("dashboard.pleaseConfirmPassword")),
     revokeOtherSessions: z.boolean().optional(),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: t("dashboard.passwordsDontMatch"),
     path: ["confirmPassword"],
   });
 
@@ -49,8 +51,8 @@ const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
 
     if (error) {
       toast.add({
-        title: "Error",
-        description: error.message || "Failed to change password",
+        title: t("common.error"),
+        description: error.message || t("dashboard.failedToChangePassword"),
         color: "error",
       });
       return;
@@ -65,15 +67,15 @@ const onPasswordSubmit = async (event: FormSubmitEvent<PasswordSchema>) => {
     };
 
     toast.add({
-      title: "Success",
-      description: "Your password has been changed successfully.",
+      title: t("common.success"),
+      description: t("dashboard.passwordChanged"),
       icon: "i-lucide-check",
       color: "success",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to change password",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("dashboard.failedToChangePassword"),
       color: "error",
     });
   } finally {
@@ -94,7 +96,7 @@ async function fetchSessions() {
     sessions.value = sessionsData || [];
   } catch (error) {
     toast.add({
-      title: "Error",
+      title: t("common.error"),
       description: error instanceof Error ? error.message : "Failed to fetch sessions",
       color: "error",
     });
@@ -109,8 +111,8 @@ async function revokeSession(token: string) {
     await authClient.revokeSession({ token });
 
     toast.add({
-      title: "Success",
-      description: "Session has been revoked.",
+      title: t("common.success"),
+      description: t("dashboard.sessionRevoked"),
       icon: "i-lucide-check",
       color: "success",
     });
@@ -119,7 +121,7 @@ async function revokeSession(token: string) {
     await fetchSessions();
   } catch (error) {
     toast.add({
-      title: "Error",
+      title: t("common.error"),
       description: error instanceof Error ? error.message : "Failed to revoke session",
       color: "error",
     });
@@ -133,8 +135,8 @@ async function revokeAllOtherSessions() {
     const currentSessionToken = session.value?.session?.token;
     if (!currentSessionToken) {
       toast.add({
-        title: "Error",
-        description: "Current session not found",
+        title: t("common.error"),
+        description: t("dashboard.sessionNotFound"),
         color: "error",
       });
       return;
@@ -148,8 +150,8 @@ async function revokeAllOtherSessions() {
     await Promise.all(revokePromises);
 
     toast.add({
-      title: "Success",
-      description: "All other sessions have been revoked.",
+      title: t("common.success"),
+      description: t("dashboard.allSessionsRevoked"),
       icon: "i-lucide-check",
       color: "success",
     });
@@ -158,8 +160,8 @@ async function revokeAllOtherSessions() {
     await fetchSessions();
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to revoke sessions",
+      title: t("common.error"),
+      description: t("dashboard.failedToRevokeSessions"),
       color: "error",
     });
   }
@@ -171,7 +173,7 @@ const deleteAccountLoading = ref(false);
 const deletePassword = ref("");
 
 const deleteAccountSchema = z.object({
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, t("common.password")),
 });
 
 const deleteAccountForm = reactive({
@@ -187,7 +189,7 @@ async function deleteAccount() {
 
     if (error) {
       toast.add({
-        title: "Error",
+        title: t("common.error"),
         description: error.message || "Failed to delete account",
         color: "error",
       });
@@ -195,8 +197,8 @@ async function deleteAccount() {
     }
 
     toast.add({
-      title: "Success",
-      description: "Your account has been deleted",
+      title: t("common.success"),
+      description: t("dashboard.accountDeleted"),
       color: "success",
     });
 
@@ -207,8 +209,8 @@ async function deleteAccount() {
     await navigateTo("/");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -238,16 +240,16 @@ onMounted(() => {
 
 <template>
   <div v-if="!session?.user" class="py-8 text-center">
-    <h3 class="mb-2 text-lg font-semibold">Not authenticated</h3>
-    <p class="mb-4">Please sign in to view your security settings.</p>
-    <UButton to="/auth/sign-in">Sign In</UButton>
+    <h3 class="mb-2 text-lg font-semibold">{{ t("common.notAuthenticated") }}</h3>
+    <p class="mb-4">{{ t("dashboard.pleaseSignInSecurity") }}</p>
+    <UButton to="/auth/sign-in">{{ t("common.signIn") }}</UButton>
   </div>
 
   <div v-else class="space-y-6">
     <!-- Password Section -->
     <UPageCard
-      title="Change Password"
-      description="Set a new password for your account."
+      :title="t('dashboard.changePassword')"
+      :description="t('dashboard.changePasswordDesc')"
       variant="subtle"
     >
       <UForm
@@ -258,56 +260,58 @@ onMounted(() => {
       >
         <UFormField
           name="currentPassword"
-          label="Current password"
+          :label="t('dashboard.currentPassword')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.currentPassword"
             type="password"
-            placeholder="Enter your current password"
+            :placeholder="t('dashboard.enterCurrentPassword')"
             autocomplete="current-password"
           />
         </UFormField>
         <UFormField
           name="newPassword"
-          label="New password"
-          description="Must be at least 8 characters"
+          :label="t('dashboard.newPassword')"
+          :description="t('dashboard.passwordHint')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.newPassword"
             type="password"
-            placeholder="Enter your new password"
+            :placeholder="t('dashboard.enterNewPassword')"
             autocomplete="new-password"
           />
         </UFormField>
         <UFormField
           name="confirmPassword"
-          label="Confirm password"
-          description="Confirm your new password"
+          :label="t('dashboard.confirmNewPassword')"
+          :description="t('dashboard.confirmNewPasswordPlaceholder')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="passwordForm.confirmPassword"
             type="password"
-            placeholder="Confirm your new password"
+            :placeholder="t('dashboard.confirmNewPasswordPlaceholder')"
             autocomplete="new-password"
           />
         </UFormField>
         <UFormField
           name="revokeOtherSessions"
-          label="Revoke other sessions"
-          description="Sign out all other devices and browsers"
+          :label="t('dashboard.revokeOtherSessions')"
+          :description="t('dashboard.signOutOtherDevices')"
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UCheckbox v-model="passwordForm.revokeOtherSessions" />
         </UFormField>
 
         <div class="flex justify-start pt-4">
-          <UButton type="submit" :loading="passwordLoading"> Change password </UButton>
+          <UButton type="submit" :loading="passwordLoading">
+            {{ t("dashboard.changePassword") }}
+          </UButton>
         </div>
       </UForm>
     </UPageCard>
@@ -324,8 +328,11 @@ onMounted(() => {
       <template #header>
         <div class="flex items-center justify-between gap-3">
           <div class="text-muted text-sm">
-            {{ sessions.filter((s) => getSessionStatus(s.expiresAt)).length }}
-            active sessions
+            {{
+              t("dashboard.activeSessionsCount", {
+                count: sessions.filter((s) => getSessionStatus(s.expiresAt)).length,
+              })
+            }}
           </div>
           <UButton
             variant="outline"
@@ -334,7 +341,7 @@ onMounted(() => {
             :disabled="sessions.length <= 1"
           >
             <UIcon name="i-lucide-power" class="mr-2 size-4" />
-            Revoke all other sessions
+            {{ t("dashboard.revokeAllSessions") }}
           </UButton>
         </div>
       </template>
@@ -347,8 +354,8 @@ onMounted(() => {
       <!-- Empty State -->
       <div v-else-if="sessions.length === 0" class="py-8 text-center">
         <UIcon name="i-lucide-key-round" class="text-muted mx-auto mb-4 size-12" />
-        <h3 class="mb-2 text-lg font-semibold">No sessions found</h3>
-        <p class="text-muted text-sm">You don't have any active sessions.</p>
+        <h3 class="mb-2 text-lg font-semibold">{{ t("dashboard.noSessions") }}</h3>
+        <p class="text-muted text-sm">{{ t("dashboard.noSessionsDesc") }}</p>
       </div>
 
       <!-- Sessions List -->
@@ -366,7 +373,8 @@ onMounted(() => {
             <div class="min-w-0 text-sm">
               <p class="truncate font-medium">Session {{ sessionItem.token.slice(-8) }}</p>
               <p class="text-muted truncate">
-                Created: {{ formatDate(sessionItem.createdAt) }} • Expires:
+                {{ t("common.created") }}: {{ formatDate(sessionItem.createdAt) }} •
+                {{ t("common.expires") }}:
                 {{ formatDate(sessionItem.expiresAt) }}
               </p>
             </div>
@@ -377,7 +385,9 @@ onMounted(() => {
               :color="getSessionStatus(sessionItem.expiresAt) ? 'success' : 'secondary'"
               variant="soft"
             >
-              {{ getSessionStatus(sessionItem.expiresAt) ? "Active" : "Expired" }}
+              {{
+                getSessionStatus(sessionItem.expiresAt) ? t("common.active") : t("common.expired")
+              }}
             </UBadge>
 
             <UButton
@@ -395,20 +405,22 @@ onMounted(() => {
 
     <!-- Delete Account Section -->
     <UPageCard
-      title="Delete Account"
-      description="Permanently delete your account and all associated data. This action is not reversible."
+      :title="t('dashboard.deleteAccount')"
+      :description="t('dashboard.deleteAccountDesc')"
       class="from-error/10 to-default bg-linear-to-tl from-5%"
     >
       <template #footer>
-        <UButton color="error" @click="deleteAccountModalOpen = true"> Delete account </UButton>
+        <UButton color="error" @click="deleteAccountModalOpen = true">
+          {{ t("dashboard.deleteAccount") }}
+        </UButton>
       </template>
     </UPageCard>
 
     <!-- Delete Account Modal -->
     <UModal
       v-model:open="deleteAccountModalOpen"
-      title="Delete Account"
-      description="This action cannot be undone"
+      :title="t('dashboard.deleteAccount')"
+      :description="t('dashboard.cannotBeUndone')"
     >
       <template #body>
         <div class="space-y-4">
@@ -416,8 +428,8 @@ onMounted(() => {
             icon="i-lucide-alert-triangle"
             color="error"
             variant="subtle"
-            title="Warning"
-            description="This will permanently delete your account and all associated data."
+            :title="t('common.warning')"
+            :description="t('dashboard.deleteAccountWarning')"
           />
 
           <UForm
@@ -428,13 +440,13 @@ onMounted(() => {
           >
             <UFormField
               name="password"
-              label="Password"
-              description="Enter your password to confirm deletion"
+              :label="t('common.password')"
+              :description="t('dashboard.enterPasswordToDelete')"
             >
               <UInput
                 v-model="deleteAccountForm.password"
                 type="password"
-                placeholder="Enter your password"
+                :placeholder="t('dashboard.enterCurrentPassword')"
                 autocomplete="current-password"
                 :disabled="deleteAccountLoading"
                 class="w-full"
@@ -447,7 +459,7 @@ onMounted(() => {
                 @click="deleteAccountModalOpen = false"
                 :disabled="deleteAccountLoading"
               >
-                Cancel
+                {{ t("common.cancel") }}
               </UButton>
               <UButton
                 color="error"
@@ -455,7 +467,7 @@ onMounted(() => {
                 :loading="deleteAccountLoading"
                 :disabled="!deleteAccountForm.password"
               >
-                Delete Account
+                {{ t("dashboard.deleteAccount") }}
               </UButton>
             </div>
           </UForm>

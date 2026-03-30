@@ -4,6 +4,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const { t } = useI18n();
 
 // Define emits
 const emit = defineEmits<{
@@ -14,7 +15,7 @@ const emit = defineEmits<{
 <template>
   <UDashboardPanel id="links">
     <template #header>
-      <UDashboardNavbar title="Links">
+      <UDashboardNavbar :title="t('admin.links')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

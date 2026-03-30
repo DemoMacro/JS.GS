@@ -3,11 +3,10 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
   layout: "app",
-  title: "JS.GS - Shorten Your Links",
-  description:
-    "Transform long URLs into short, memorable links with powerful analytics and tracking.",
 });
 
 const toast = useToast();
@@ -21,7 +20,7 @@ const schema = z.object({
     .transform((val) => val.trim())
     .refine(
       (val) => val === "" || /^[a-zA-Z][a-zA-Z\d+-.]*:/.test(val),
-      "Please enter a valid URL",
+      t("home.validUrlRequired"),
     ),
 });
 
@@ -47,8 +46,8 @@ async function createShortLink() {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to create link",
+        title: t("common.error"),
+        description: result.error.message || t("home.failedToCreateLink"),
         color: "error",
       });
       return;
@@ -60,16 +59,16 @@ async function createShortLink() {
     };
 
     toast.add({
-      title: "Success",
-      description: "Link created successfully",
+      title: t("common.success"),
+      description: t("home.linkCreated"),
       color: "success",
     });
 
     state.originalUrl = "";
-  } catch (error) {
+  } catch {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -88,14 +87,14 @@ async function copyToClipboard() {
   try {
     await navigator.clipboard.writeText(shortUrl.value);
     toast.add({
-      title: "Copied",
-      description: "Link copied to clipboard",
+      title: t("common.copied"),
+      description: t("home.linkCopied"),
       color: "success",
     });
-  } catch (error) {
+  } catch {
     toast.add({
-      title: "Error",
-      description: "Failed to copy link",
+      title: t("common.error"),
+      description: t("home.failedToCopyLink"),
       color: "error",
     });
   }
@@ -104,10 +103,7 @@ async function copyToClipboard() {
 
 <template>
   <div>
-    <UPageHero
-      title="Shorten Your Links"
-      description="Transform long URLs into short, memorable links with powerful analytics and tracking."
-    >
+    <UPageHero :title="t('home.heroTitle')" :description="t('home.heroDescription')">
       <template #default>
         <UContainer class="max-w-3xl">
           <div class="flex flex-col items-center gap-8">
@@ -117,7 +113,7 @@ async function copyToClipboard() {
                   <UInput
                     v-model="state.originalUrl"
                     size="lg"
-                    placeholder="Paste your long URL here"
+                    :placeholder="t('home.urlPlaceholder')"
                     :disabled="loading"
                     class="flex-1"
                   />
@@ -128,7 +124,7 @@ async function copyToClipboard() {
                     :loading="loading"
                     :disabled="!state.originalUrl || state.originalUrl.trim().length === 0"
                   >
-                    Shorten
+                    {{ t("home.shorten") }}
                   </UButton>
                 </UFieldGroup>
               </UFormField>
@@ -136,7 +132,7 @@ async function copyToClipboard() {
 
             <UCard v-if="createdLink" class="w-full">
               <div class="space-y-6">
-                <UFormField label="Your short link">
+                <UFormField :label="t('home.yourShortLink')">
                   <div class="flex items-center gap-2">
                     <UInput
                       :model-value="shortUrl"
@@ -147,14 +143,14 @@ async function copyToClipboard() {
                       class="flex-1"
                     />
                     <UButton icon="i-lucide-copy" size="md" @click="copyToClipboard">
-                      Copy
+                      {{ t("common.copy") }}
                     </UButton>
                   </div>
                 </UFormField>
 
                 <USeparator />
 
-                <UFormField label="Original URL">
+                <UFormField :label="t('home.originalUrl')">
                   <UInput
                     :model-value="createdLink.originalUrl"
                     readonly
@@ -173,60 +169,55 @@ async function copyToClipboard() {
 
     <UPageSection
       id="features"
-      title="Features"
-      description="Everything you need to manage and track your links"
+      :title="t('home.featuresTitle')"
+      :description="t('home.featuresDescription')"
       :features="[
         {
           icon: 'i-lucide-link',
-          title: 'Link Shortening',
-          description:
-            'Transform long URLs into short, memorable links that are easy to share and remember.',
+          title: t('home.featureLinkShorteningTitle'),
+          description: t('home.featureLinkShortening'),
         },
         {
           icon: 'i-lucide-bar-chart-2',
-          title: 'Detailed Analytics',
-          description:
-            'Track clicks, countries, devices, browsers, and more with interactive charts.',
+          title: t('home.featureAnalyticsTitle'),
+          description: t('home.featureAnalytics'),
         },
         {
           icon: 'i-lucide-clock',
-          title: 'Time Series Data',
-          description:
-            'View your link performance over time with hourly, daily, and weekly aggregations.',
+          title: t('home.featureTimeSeriesTitle'),
+          description: t('home.featureTimeSeries'),
         },
         {
           icon: 'i-lucide-globe',
-          title: 'Geographic Insights',
-          description: 'See where your clicks are coming from with country and city breakdowns.',
+          title: t('home.featureGeographicTitle'),
+          description: t('home.featureGeographic'),
         },
         {
           icon: 'i-lucide-tag',
-          title: 'UTM Tracking',
-          description:
-            'Understand your marketing campaigns with source, medium, and term tracking.',
+          title: t('home.featureUtmTitle'),
+          description: t('home.featureUtm'),
         },
         {
           icon: 'i-lucide-qr-code',
-          title: 'QR Code Generation',
-          description:
-            'Generate QR codes for your short links instantly, perfect for print materials and offline marketing.',
+          title: t('home.featureQrCodeTitle'),
+          description: t('home.featureQrCode'),
         },
       ]"
     />
 
     <UPageSection>
       <UPageCTA
-        title="Ready to Get Started?"
-        description="Create your first short link and start tracking today."
+        :title="t('home.ctaTitle')"
+        :description="t('home.ctaDescription')"
         :links="[
           {
-            label: 'Get Started',
+            label: t('common.getStarted'),
             to: session?.user ? '/dashboard' : '/auth/sign-up',
             trailingIcon: 'i-lucide-arrow-right',
             color: 'neutral',
           },
           {
-            label: 'View on GitHub',
+            label: t('common.viewOnGithub'),
             to: 'https://github.com/DemoMacro/JS.GS',
             target: '_blank',
             icon: 'i-simple-icons-github',

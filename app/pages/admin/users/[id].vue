@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "User Details - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 const route = useRoute();
@@ -12,27 +14,27 @@ const userId = route.params.id as string;
 const { user, loading } = useUser(userId);
 
 // Navigation items
-const links = [
+const links = computed<NavigationMenuItem[][]>(() => [
   [
     {
-      label: "Overview",
+      label: t("common.overview"),
       icon: "i-lucide-user",
       to: `/admin/users/${userId}`,
       exact: true,
     },
     {
-      label: "Security",
+      label: t("common.security"),
       icon: "i-lucide-shield",
       to: `/admin/users/${userId}/security`,
     },
   ],
-] satisfies NavigationMenuItem[][];
+]);
 </script>
 
 <template>
   <UDashboardPanel id="user-settings" :ui="{ body: 'lg:py-12' }">
     <template #header>
-      <UDashboardNavbar :title="`User - ${user?.name || user?.email || 'Unknown'}`">
+      <UDashboardNavbar :title="`User - ${user?.name || user?.email || t('common.unknown')}`">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -50,11 +52,13 @@ const links = [
       </div>
 
       <div v-else-if="!user" class="py-8 text-center">
-        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">User not found</h3>
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">
+          {{ t("admin.userNotFound") }}
+        </h3>
         <p class="text-muted-foreground mb-4">
-          The user you're looking for doesn't exist or you don't have permission to view it.
+          {{ t("admin.userNotFoundDesc") }}
         </p>
-        <UButton to="/admin/users">Back to Users</UButton>
+        <UButton to="/admin/users">{{ t("admin.backToUsers") }}</UButton>
       </div>
 
       <div v-else class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">

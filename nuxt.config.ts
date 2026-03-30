@@ -82,7 +82,6 @@ export default defineNuxtConfig({
       cookieCrossOrigin: true,
     },
     strategy: "no_prefix",
-    skipSettingLocaleOnNavigate: false,
     differentDomains: false,
   },
 

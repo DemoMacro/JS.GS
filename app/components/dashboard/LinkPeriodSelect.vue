@@ -1,13 +1,15 @@
 <script setup lang="ts">
+const { t } = useI18n();
+
 type Period = "daily" | "weekly" | "monthly";
 
 const model = defineModel<Period>({ required: true });
 
-const items = [
-  { label: "Last 7 days", value: "daily" },
-  { label: "Last 30 days", value: "weekly" },
-  { label: "Last 90 days", value: "monthly" },
-];
+const items = computed(() => [
+  { label: t("dashboard.last7Days"), value: "daily" },
+  { label: t("dashboard.last30Days"), value: "weekly" },
+  { label: t("dashboard.last90Days"), value: "monthly" },
+]);
 </script>
 
 <template>

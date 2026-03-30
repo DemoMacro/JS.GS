@@ -4,6 +4,8 @@ import type { Link } from "~~/shared/types/link";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   link: Link | null;
 }>();
@@ -19,7 +21,7 @@ const loading = ref(false);
 
 const schema = z.object({
   confirmText: z.string().refine((val) => val === props.link?.shortCode, {
-    message: "Please enter the short code to confirm deletion",
+    message: t("dashboard.enterShortCodeConfirm"),
   }),
 });
 
@@ -32,8 +34,8 @@ const state = reactive<Partial<Schema>>({
 async function deleteLink() {
   if (!props.link?.id) {
     toast.add({
-      title: "Error",
-      description: "Link ID is required",
+      title: t("common.error"),
+      description: t("dashboard.linkIdRequired"),
       color: "error",
     });
     return;
@@ -47,16 +49,16 @@ async function deleteLink() {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to delete link",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToCreateLink"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `Link ${props.link.shortCode} has been deleted`,
+      title: t("common.success"),
+      description: t("dashboard.linkDeleted", { shortCode: props.link.shortCode }),
       color: "success",
     });
 
@@ -65,8 +67,8 @@ async function deleteLink() {
     state.confirmText = "";
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -76,22 +78,24 @@ async function deleteLink() {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Delete Link" description="This action cannot be undone">
+  <UModal
+    v-model:open="open"
+    :title="t('dashboard.deleteLink')"
+    :description="t('dashboard.cannotBeUndone')"
+  >
     <slot />
 
     <template #body>
       <div class="space-y-4">
         <p class="text-muted-foreground">
-          Are you sure you want to delete the link
-          <span class="font-mono font-semibold">{{ link?.shortCode }}</span
-          >? This action cannot be undone.
+          {{ t("dashboard.sureDeleteLink", { shortCode: link?.shortCode }) }}
         </p>
 
         <UForm :schema="schema" :state="state" class="space-y-4" @submit="deleteLink">
           <UFormField
             name="confirmText"
-            :label="`Type '${link?.shortCode}' to confirm`"
-            description="Please enter the short code to confirm deletion"
+            :label="t('common.typeToConfirm', { name: link?.shortCode })"
+            :description="t('dashboard.enterShortCodeConfirm')"
           >
             <UInput
               v-model="state.confirmText"
@@ -102,14 +106,16 @@ async function deleteLink() {
           </UFormField>
 
           <div class="flex justify-end gap-2">
-            <UButton variant="outline" @click="open = false" :disabled="loading"> Cancel </UButton>
+            <UButton variant="outline" @click="open = false" :disabled="loading">
+              {{ t("common.cancel") }}
+            </UButton>
             <UButton
               color="error"
               type="submit"
               :loading="loading"
               :disabled="state.confirmText !== link?.shortCode"
             >
-              Delete Link
+              {{ t("dashboard.deleteLink") }}
             </UButton>
           </div>
         </UForm>

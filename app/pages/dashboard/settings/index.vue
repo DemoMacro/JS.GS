@@ -4,8 +4,10 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Profile Settings - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
@@ -15,17 +17,14 @@ const { data: session } = await authClient.useSession(useFetch);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
-  name: z.string().min(2, "Too short"),
+  name: z.string().min(2, t("admin.tooShort")),
   username: z
     .string()
-    .min(5, "Username must be at least 5 characters")
-    .regex(
-      /^[a-zA-Z0-9_-]+$/,
-      "Username can only contain letters, numbers, underscores, and hyphens",
-    )
+    .min(5, t("auth.usernameMin5"))
+    .regex(/^[a-zA-Z0-9_-]+$/, t("auth.usernameFormat"))
     .optional(),
-  email: z.string().email("Invalid email"),
-  image: z.string().url("Invalid URL").optional().or(z.literal("")),
+  email: z.string().email(t("common.invalidEmail")),
+  image: z.string().url(t("dashboard.invalidUrl")).optional().or(z.literal("")),
 });
 
 type ProfileSchema = z.output<typeof profileSchema>;
@@ -67,16 +66,16 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
       if (error) {
         toast.add({
-          title: "Error",
-          description: error.message || "Failed to change email",
+          title: t("common.error"),
+          description: error.message || t("dashboard.failedToChangeEmail"),
           color: "error",
         });
         return;
       }
 
       toast.add({
-        title: "Email Change Initiated",
-        description: "Please check your current and new email for verification links",
+        title: t("dashboard.emailChangeInitiated"),
+        description: t("dashboard.emailChangeVerifyDesc"),
         icon: "i-lucide-mail",
         color: "success",
       });
@@ -92,7 +91,7 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
     if (error) {
       toast.add({
-        title: "Error",
+        title: t("common.error"),
         description: error.message || "Failed to update profile",
         color: "error",
       });
@@ -113,14 +112,14 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
     }
 
     toast.add({
-      title: "Success",
-      description: "Your profile has been updated.",
+      title: t("common.success"),
+      description: t("dashboard.profileUpdated"),
       icon: "i-lucide-check",
       color: "success",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
+      title: t("common.error"),
       description: error instanceof Error ? error.message : "Failed to update profile",
       color: "error",
     });
@@ -132,16 +131,18 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
 
 <template>
   <div v-if="!session?.user" class="py-8 text-center">
-    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Not authenticated</h3>
-    <p class="text-muted-foreground mb-4">Please sign in to view your profile settings.</p>
-    <UButton to="/auth/sign-in">Sign In</UButton>
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">
+      {{ t("common.notAuthenticated") }}
+    </h3>
+    <p class="text-muted-foreground mb-4">{{ t("dashboard.pleaseSignInProfile") }}</p>
+    <UButton to="/auth/sign-in">{{ t("common.signIn") }}</UButton>
   </div>
 
   <div v-else>
     <UForm id="settings" :schema="profileSchema" :state="profile" @submit="onSubmit">
       <UPageCard
-        title="Profile"
-        description="These informations will be displayed publicly."
+        :title="t('dashboard.profile')"
+        :description="t('dashboard.profilePublicInfo')"
         variant="naked"
         orientation="horizontal"
         class="mb-4"
@@ -149,13 +150,13 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <div class="flex w-fit gap-3 lg:ms-auto">
           <UButton
             to="/dashboard/settings/security"
-            label="Security Settings"
+            :label="t('dashboard.securitySettingsBtn')"
             color="neutral"
             variant="outline"
           />
           <UButton
             form="settings"
-            label="Save changes"
+            :label="t('dashboard.saveChanges')"
             color="neutral"
             type="submit"
             :loading="loading"
@@ -166,8 +167,8 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
       <UPageCard variant="subtle">
         <UFormField
           name="name"
-          label="Name"
-          description="Will appear on receipts, invoices, and other communication."
+          :label="t('common.name')"
+          :description="t('dashboard.nameDisplayDesc')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
@@ -176,8 +177,8 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <USeparator />
         <UFormField
           name="username"
-          label="Username"
-          description="Letters, numbers, hyphens and underscores only."
+          :label="t('common.username')"
+          :description="t('dashboard.usernameDesc')"
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput v-model="profile.username" autocomplete="off" />
@@ -185,8 +186,8 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <USeparator />
         <UFormField
           name="email"
-          label="Email"
-          description="Changing your email will require verification."
+          :label="t('common.email')"
+          :description="t('dashboard.emailChangeDesc')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
@@ -195,13 +196,13 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <USeparator />
         <UFormField
           name="image"
-          label="Avatar URL"
-          description="URL to your profile image."
+          :label="t('dashboard.avatarUrl')"
+          :description="t('dashboard.avatarUrlDesc')"
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="profile.image"
-            placeholder="https://example.com/avatar.jpg"
+            :placeholder="t('dashboard.avatarPlaceholder')"
             autocomplete="off"
           />
         </UFormField>

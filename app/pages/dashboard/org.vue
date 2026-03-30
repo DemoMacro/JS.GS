@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Organization - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 // Get active organization
@@ -13,18 +15,18 @@ const activeOrg = computed(() => activeOrgResult.value.data);
 const links = computed<NavigationMenuItem[][]>(() => [
   [
     {
-      label: "Overview",
+      label: t("common.overview"),
       icon: "i-lucide-building",
       to: `/dashboard/org`,
       exact: true,
     },
     {
-      label: "Members",
+      label: t("common.members"),
       icon: "i-lucide-users",
       to: `/dashboard/org/members`,
     },
     {
-      label: "Security",
+      label: t("common.security"),
       icon: "i-lucide-shield",
       to: `/dashboard/org/security`,
     },
@@ -35,7 +37,9 @@ const links = computed<NavigationMenuItem[][]>(() => [
 <template>
   <UDashboardPanel id="organization-settings" :ui="{ body: 'lg:py-12' }">
     <template #header>
-      <UDashboardNavbar :title="`Organization - ${activeOrg?.name || 'Unknown'}`">
+      <UDashboardNavbar
+        :title="`${t('dashboard.org')} - ${activeOrg?.name || t('common.unknown')}`"
+      >
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -49,15 +53,17 @@ const links = computed<NavigationMenuItem[][]>(() => [
     <template #body>
       <div v-if="!activeOrg" class="py-8 text-center">
         <UIcon name="i-lucide-building" class="text-muted-foreground mx-auto mb-4 size-12" />
-        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">No Active Organization</h3>
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">
+          {{ t("dashboard.noActiveOrg") }}
+        </h3>
         <p class="text-muted-foreground mb-4">
-          Please select an organization from the menu or create a new one.
+          {{ t("dashboard.noActiveOrgDesc") }}
         </p>
         <UButton to="/dashboard/create-org">
           <template #leading>
             <UIcon name="i-lucide-plus" />
           </template>
-          Create Organization
+          {{ t("dashboard.createOrg") }}
         </UButton>
       </div>
 

@@ -4,6 +4,8 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 interface Props {
   linkId: string;
   backTo: string; // The back link path
@@ -17,7 +19,7 @@ const toast = useToast();
 
 const schema = z.object({
   organizationId: z.string().optional(),
-  originalUrl: z.string().url("Please enter a valid URL"),
+  originalUrl: z.string().url(t("home.validUrlRequired")),
   domainId: z.string().optional(),
   title: z.string().max(200).nullable().optional(),
   description: z.string().max(500).nullable().optional(),
@@ -67,24 +69,24 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to update link",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToUpdateLink"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: "Link updated successfully",
+      title: t("common.success"),
+      description: t("dashboard.linkUpdated"),
       color: "success",
     });
 
     await fetchLink();
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -97,15 +99,22 @@ async function updateLink(event: FormSubmitEvent<Schema>) {
   <div v-if="link" class="mx-auto w-full lg:max-w-2xl">
     <UForm id="edit-link" :schema="schema" :state="state" @submit="updateLink">
       <UPageCard
-        title="Edit Link"
-        description="Update link details and settings"
+        :title="t('dashboard.editLink')"
+        :description="t('dashboard.editLinkDesc')"
         variant="naked"
         orientation="horizontal"
         class="mb-4"
       >
         <div class="ms-auto flex gap-3">
-          <UButton variant="outline" :to="backTo" :disabled="submitting"> Cancel </UButton>
-          <UButton label="Save Changes" color="primary" type="submit" :loading="submitting">
+          <UButton variant="outline" :to="backTo" :disabled="submitting">
+            {{ t("common.cancel") }}
+          </UButton>
+          <UButton
+            :label="t('dashboard.saveChanges')"
+            color="primary"
+            type="submit"
+            :loading="submitting"
+          >
             <template #leading>
               <UIcon name="i-lucide-save" />
             </template>

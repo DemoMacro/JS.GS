@@ -4,27 +4,26 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Create User - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
 
 // Form schema
 const schema = z.object({
-  email: z.string().email("Invalid email address"),
-  name: z.string().min(1, "Name is required"),
+  email: z.string().email(t("auth.invalidEmail")),
+  name: z.string().min(1, t("admin.orgNameRequired")),
   username: z
     .string()
-    .min(5, "Username must be at least 5 characters")
-    .max(30, "Username must be at most 30 characters")
-    .regex(
-      /^[a-zA-Z0-9_-]+$/,
-      "Username can only contain letters, numbers, underscores, and hyphens",
-    ),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+    .min(5, t("auth.usernameMin5"))
+    .max(30, t("auth.usernameMax30"))
+    .regex(/^[a-zA-Z0-9_-]+$/, t("auth.usernameFormat")),
+  password: z.string().min(6, t("auth.passwordMin6")),
   role: z.enum(["user", "admin"]).refine((val) => val !== undefined, {
-    message: "Please select a role",
+    message: t("admin.pleaseSelectRole"),
   }),
 });
 
@@ -58,16 +57,16 @@ async function createUser(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to create user",
+        title: t("common.error"),
+        description: result.error.message || t("admin.failedToCreateUser"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `User ${event.data.email} has been created successfully`,
+      title: t("common.success"),
+      description: t("admin.userCreated", { name: event.data.email }),
       color: "success",
     });
 
@@ -75,8 +74,8 @@ async function createUser(event: FormSubmitEvent<Schema>) {
     await navigateTo("/admin/users");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred while creating user",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -88,7 +87,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
 <template>
   <UDashboardPanel id="create-user">
     <template #header>
-      <UDashboardNavbar title="Create User">
+      <UDashboardNavbar :title="t('admin.createUser')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -99,17 +98,19 @@ async function createUser(event: FormSubmitEvent<Schema>) {
       <div class="mx-auto flex w-full flex-col gap-4 sm:gap-6 lg:max-w-2xl lg:gap-12">
         <UForm id="create-user" :schema="schema" :state="state" @submit="createUser">
           <UPageCard
-            title="Create User"
-            description="Create a new user account with appropriate permissions."
+            :title="t('admin.createUser')"
+            :description="t('admin.createUserDesc')"
             variant="naked"
             orientation="horizontal"
             class="mb-4"
           >
             <div class="ms-auto flex gap-3">
-              <UButton variant="outline" to="/admin/users" :disabled="submitting"> Cancel </UButton>
+              <UButton variant="outline" to="/admin/users" :disabled="submitting">
+                {{ t("common.cancel") }}
+              </UButton>
               <UButton
                 form="create-user"
-                label="Create User"
+                :label="t('admin.createUser')"
                 color="primary"
                 type="submit"
                 :loading="submitting"
@@ -124,15 +125,15 @@ async function createUser(event: FormSubmitEvent<Schema>) {
           <UPageCard variant="subtle">
             <UFormField
               name="email"
-              label="Email Address"
-              description="The user's email address for login and communications."
+              :label="t('auth.emailAddress')"
+              :description="t('admin.emailDescUser')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.email"
                 type="email"
-                placeholder="user@example.com"
+                :placeholder="t('admin.emailPlaceholder')"
                 autocomplete="off"
                 :disabled="submitting"
               />
@@ -140,14 +141,14 @@ async function createUser(event: FormSubmitEvent<Schema>) {
             <USeparator />
             <UFormField
               name="name"
-              label="Full Name"
-              description="The user's display name."
+              :label="t('auth.fullName')"
+              :description="t('admin.displayNameDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.name"
-                placeholder="John Doe"
+                :placeholder="t('admin.namePlaceholder')"
                 autocomplete="off"
                 :disabled="submitting"
               />
@@ -155,8 +156,8 @@ async function createUser(event: FormSubmitEvent<Schema>) {
             <USeparator />
             <UFormField
               name="username"
-              label="Username"
-              description="Unique username for the user."
+              :label="t('common.username')"
+              :description="t('admin.uniqueUsernameDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
@@ -170,8 +171,8 @@ async function createUser(event: FormSubmitEvent<Schema>) {
             <USeparator />
             <UFormField
               name="password"
-              label="Password"
-              description="Initial password for the user account."
+              :label="t('common.password')"
+              :description="t('admin.initialPasswordDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
@@ -179,7 +180,7 @@ async function createUser(event: FormSubmitEvent<Schema>) {
                 <UInput
                   v-model="state.password"
                   type="password"
-                  placeholder="Enter password"
+                  :placeholder="t('admin.passwordPlaceholder')"
                   autocomplete="off"
                   :disabled="submitting"
                   class="flex-1"
@@ -189,16 +190,16 @@ async function createUser(event: FormSubmitEvent<Schema>) {
             <USeparator />
             <UFormField
               name="role"
-              label="Role"
-              description="User role determines access permissions."
+              :label="t('common.role')"
+              :description="t('admin.roleAccessDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <USelect
                 v-model="state.role"
                 :items="[
-                  { label: 'User', value: 'user' },
-                  { label: 'Admin', value: 'admin' },
+                  { label: t('common.user'), value: 'user' },
+                  { label: t('common.admin'), value: 'admin' },
                 ]"
                 class="w-full"
                 :disabled="submitting"

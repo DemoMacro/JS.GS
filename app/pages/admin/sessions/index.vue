@@ -2,8 +2,10 @@
 import type { TableColumn } from "@nuxt/ui";
 import { getPaginationRowModel } from "@tanstack/table-core";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Sessions - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 // Table state
@@ -40,40 +42,40 @@ watch(
 );
 
 // Table columns
-const columns: TableColumn<any>[] = [
+const columns = computed<TableColumn<any>[]>(() => [
   {
     accessorKey: "userEmail",
-    header: "User",
+    header: t("common.user"),
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: t("common.role"),
   },
   {
     accessorKey: "token",
-    header: "Token",
+    header: t("admin.token"),
   },
   {
     accessorKey: "ipAddress",
-    header: "IP Address",
+    header: t("admin.ipAddress"),
   },
   {
     accessorKey: "userAgent",
-    header: "User Agent",
+    header: t("admin.userAgent"),
   },
   {
     accessorKey: "createdAt",
-    header: "Created",
+    header: t("common.created"),
   },
   {
     accessorKey: "expiresAt",
-    header: "Expires",
+    header: t("common.expires"),
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: t("common.actions"),
   },
-];
+]);
 
 // Get session status
 function getSessionStatus(expiresAt: string) {
@@ -88,14 +90,14 @@ async function handleRevokeSession(session: any) {
     await revokeUserSessions(session.userId);
 
     toast.add({
-      title: "Success",
-      description: "Sessions revoked successfully",
+      title: t("common.success"),
+      description: t("admin.sessionsRevoked"),
       color: "success",
     });
   } catch (err) {
     toast.add({
-      title: "Error",
-      description: err instanceof Error ? err.message : "Failed to revoke sessions",
+      title: t("common.error"),
+      description: err instanceof Error ? err.message : t("admin.failedToRevokeSessions"),
       color: "error",
     });
   }
@@ -105,7 +107,7 @@ async function handleRevokeSession(session: any) {
 <template>
   <UDashboardPanel id="sessions">
     <template #header>
-      <UDashboardNavbar title="Sessions">
+      <UDashboardNavbar :title="t('admin.sessions')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -120,7 +122,7 @@ async function handleRevokeSession(session: any) {
             :model-value="table?.tableApi?.getColumn('userEmail')?.getFilterValue() as string"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Filter users..."
+            :placeholder="t('admin.filterUsers')"
             @update:model-value="table?.tableApi?.getColumn('userEmail')?.setFilterValue($event)"
           />
 
@@ -128,10 +130,10 @@ async function handleRevokeSession(session: any) {
             <USelect
               v-model="pagination.pageSize"
               :items="[
-                { label: '10 per page', value: 10 },
-                { label: '25 per page', value: 25 },
-                { label: '50 per page', value: 50 },
-                { label: '100 per page', value: 100 },
+                { label: t('dashboard.perPage', { count: 10 }), value: 10 },
+                { label: t('dashboard.perPage', { count: 25 }), value: 25 },
+                { label: t('dashboard.perPage', { count: 50 }), value: 50 },
+                { label: t('dashboard.perPage', { count: 100 }), value: 100 },
               ]"
               class="min-w-32"
             />
@@ -220,7 +222,7 @@ async function handleRevokeSession(session: any) {
                   :to="`/admin/users/${row.original.userId}`"
                   variant="ghost"
                   icon="i-lucide-eye"
-                  title="View User"
+                  :title="t('admin.viewUser')"
                 />
 
                 <!-- Revoke User Sessions -->
@@ -228,7 +230,7 @@ async function handleRevokeSession(session: any) {
                   variant="ghost"
                   icon="i-lucide-power"
                   color="error"
-                  title="Revoke All User Sessions"
+                  :title="t('admin.revokeAllUserSessions')"
                   :disabled="getSessionStatus(row.getValue('expiresAt')) === 'expired'"
                   @click="handleRevokeSession(row.original)"
                 />

@@ -2,6 +2,8 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 
+const { t } = useI18n();
+
 interface Props {
   schema: z.ZodObject<any>;
   state: Partial<Record<string, any>>;
@@ -17,19 +19,27 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   submit: [event: FormSubmitEvent<any>];
 }>();
+
+const slugDescription = computed(() =>
+  props.isPersonalOrg ? t("dashboard.orgSlugManaged") : t("dashboard.orgSlugDesc"),
+);
+
+const slugHint = computed(() =>
+  props.isPersonalOrg ? t("dashboard.managedAutomatically") : undefined,
+);
 </script>
 
 <template>
   <UFormField
     name="name"
-    label="Organization Name"
-    description="The display name for your organization."
+    :label="t('dashboard.orgName')"
+    :description="t('dashboard.orgDisplayName')"
     required
     class="flex items-start justify-between gap-4 max-sm:flex-col"
   >
     <UInput
       v-model="state.name"
-      placeholder="Acme Corp"
+      :placeholder="t('dashboard.orgNamePlaceholder')"
       autocomplete="off"
       :disabled="submitting"
     />
@@ -39,21 +49,17 @@ const emit = defineEmits<{
 
   <UFormField
     name="slug"
-    label="Slug"
-    :description="
-      isPersonalOrg
-        ? 'Personal organization slug is managed automatically.'
-        : 'Unique identifier used in URLs and API calls.'
-    "
+    :label="t('dashboard.orgSlug')"
+    :description="slugDescription"
     required
     class="flex items-start justify-between gap-4 max-sm:flex-col"
   >
     <UInput
       v-model="state.slug"
-      placeholder="acme-corp"
+      :placeholder="t('dashboard.orgSlugPlaceholder')"
       autocomplete="off"
       :disabled="submitting || isPersonalOrg"
-      :hint="isPersonalOrg ? 'Managed automatically' : undefined"
+      :hint="slugHint"
     />
   </UFormField>
 
@@ -61,14 +67,14 @@ const emit = defineEmits<{
 
   <UFormField
     name="logo"
-    label="Logo URL"
-    description="Organization logo image URL."
+    :label="t('dashboard.logoUrl')"
+    :description="t('dashboard.orgLogoUrlDesc')"
     class="flex items-start justify-between gap-4 max-sm:flex-col"
   >
     <UInput
       v-model="state.logo"
       type="url"
-      placeholder="https://example.com/logo.png"
+      :placeholder="t('admin.logoPlaceholder')"
       autocomplete="off"
       :disabled="submitting"
     />

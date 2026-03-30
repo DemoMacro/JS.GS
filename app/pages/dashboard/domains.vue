@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: "Domains - JS.GS",
+  layout: "dashboard",
 });
 </script>
 

@@ -5,8 +5,10 @@ import type { Organization } from "better-auth/plugins";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Organizations - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 // Table state
@@ -63,8 +65,8 @@ const total = computed(() => orgsData.value?.total ?? 0);
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch organizations",
+      title: t("common.error"),
+      description: t("admin.failedToFetchOrganizations"),
       color: "error",
     });
   }
@@ -79,30 +81,30 @@ watch(
 );
 
 // Table columns
-const columns: TableColumn<Organization>[] = [
+const columns = computed<TableColumn<Organization>[]>(() => [
   {
     accessorKey: "name",
-    header: "Name",
+    header: t("common.name"),
   },
   {
     accessorKey: "slug",
-    header: "Slug",
+    header: t("admin.slug"),
   },
   {
     accessorKey: "createdAt",
-    header: "Created",
+    header: t("common.created"),
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: t("common.actions"),
   },
-];
+]);
 </script>
 
 <template>
   <UDashboardPanel id="organizations">
     <template #header>
-      <UDashboardNavbar title="Organizations">
+      <UDashboardNavbar :title="t('admin.organizations')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -117,12 +119,12 @@ const columns: TableColumn<Organization>[] = [
             :model-value="table?.tableApi?.getColumn('name')?.getFilterValue() as string"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Filter organizations..."
+            :placeholder="t('admin.filterOrganizations')"
             @update:model-value="table?.tableApi?.getColumn('name')?.setFilterValue($event)"
           />
 
           <div class="flex flex-wrap items-center gap-2">
-            <UButton to="/admin/orgs/create" label="Add Organization">
+            <UButton :to="`/admin/orgs/create`" :label="t('admin.addOrganization')">
               <template #leading>
                 <UIcon name="i-lucide-plus" />
               </template>
@@ -131,10 +133,10 @@ const columns: TableColumn<Organization>[] = [
             <USelect
               v-model="pagination.pageSize"
               :items="[
-                { label: '10 per page', value: 10 },
-                { label: '25 per page', value: 25 },
-                { label: '50 per page', value: 50 },
-                { label: '100 per page', value: 100 },
+                { label: t('dashboard.perPage', { count: 10 }), value: 10 },
+                { label: t('dashboard.perPage', { count: 25 }), value: 25 },
+                { label: t('dashboard.perPage', { count: 50 }), value: 50 },
+                { label: t('dashboard.perPage', { count: 100 }), value: 100 },
               ]"
               class="min-w-32"
             />
@@ -184,7 +186,7 @@ const columns: TableColumn<Organization>[] = [
                   :to="`/admin/orgs/${row.original.id}`"
                   variant="ghost"
                   icon="i-lucide-eye"
-                  title="View Details"
+                  :title="t('common.viewDetails')"
                 />
 
                 <!-- Manage Members -->
@@ -192,7 +194,7 @@ const columns: TableColumn<Organization>[] = [
                   :to="`/admin/orgs/${row.original.id}/members`"
                   variant="ghost"
                   icon="i-lucide-users"
-                  title="Manage Members"
+                  :title="t('admin.manageMembers')"
                 />
 
                 <!-- Security Settings -->
@@ -200,7 +202,7 @@ const columns: TableColumn<Organization>[] = [
                   :to="`/admin/orgs/${row.original.id}/security`"
                   variant="ghost"
                   icon="i-lucide-shield"
-                  title="Security Settings"
+                  :title="t('admin.securitySettings')"
                 />
 
                 <!-- Delete (Keep as Modal for dangerous action) -->
@@ -209,7 +211,7 @@ const columns: TableColumn<Organization>[] = [
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
-                    title="Delete Organization"
+                    :title="t('admin.deleteOrganization')"
                   />
                 </DashboardOrgDeleteModal>
               </div>

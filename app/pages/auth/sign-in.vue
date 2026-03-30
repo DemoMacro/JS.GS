@@ -5,34 +5,35 @@ import * as z from "zod";
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
+const { t } = useI18n();
 
 definePageMeta({
-  title: "Sign In - JS.GS",
+  layout: "app",
 });
 
-const fields: AuthFormField[] = [
+const fields = computed<AuthFormField[]>(() => [
   {
     name: "identifier",
     type: "text",
-    label: "Email or Username",
+    label: t("auth.emailOrUsername"),
     required: true,
   },
   {
     name: "password",
-    label: "Password",
+    label: t("common.password"),
     type: "password",
     required: true,
   },
   {
     name: "rememberMe",
-    label: "Remember me",
+    label: t("auth.rememberMe"),
     type: "checkbox",
   },
-];
+]);
 
 const schema = z.object({
-  identifier: z.string().min(1, "Email or username is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  identifier: z.string().min(1, t("auth.emailOrUsernameRequired")),
+  password: z.string().min(6, t("auth.passwordMin6")),
   rememberMe: z.boolean().optional(),
 });
 
@@ -64,17 +65,16 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       // Handle email verification required error (403)
       if (error.status === 403) {
         toast.add({
-          title: "Email Verification Required",
-          description:
-            "Please verify your email address. We've sent a verification link to your email.",
+          title: t("auth.verificationRequired"),
+          description: t("auth.verificationRequiredDesc"),
           color: "warning",
         });
         return;
       }
 
       toast.add({
-        title: "Sign In Error",
-        description: error.message || "Invalid credentials",
+        title: t("auth.signInError"),
+        description: error.message || t("auth.invalidCredentials"),
         color: "error",
       });
       return;
@@ -88,14 +88,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     }
 
     toast.add({
-      title: "Welcome Back!",
-      description: "Successfully signed in",
+      title: t("auth.welcomeBack"),
+      description: t("auth.signedIn"),
       color: "success",
     });
-  } catch (error) {
+  } catch {
     toast.add({
-      title: "Sign In Error",
-      description: "An unexpected error occurred",
+      title: t("auth.signInError"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -109,28 +109,32 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
-        title="Sign In"
-        description="Enter your credentials to access your account"
+        :title="t('auth.signInTitle')"
+        :description="t('auth.signInDescription')"
         icon="i-lucide-user"
         :fields="fields"
         :submit="{
-          label: 'Sign In',
+          label: t('common.signIn'),
           loading,
           block: true,
         }"
         @submit="onSubmit"
       >
         <template #description>
-          Don't have an account?
-          <ULink to="/auth/sign-up" class="text-primary font-medium"> Sign up </ULink>.
+          {{ t("auth.noAccount") }}
+          <ULink to="/auth/sign-up" class="text-primary font-medium">
+            {{ t("common.signUp") }} </ULink
+          >.
         </template>
 
         <template #footer>
           <div class="mt-4 flex flex-col gap-2">
             <div class="flex items-center justify-between text-sm">
-              <ULink to="/auth/forgot-password" class="text-primary"> Forgot password? </ULink>
+              <ULink to="/auth/forgot-password" class="text-primary">
+                {{ t("auth.forgotPassword") }}
+              </ULink>
               <ULink to="/auth/verify-email" class="text-primary">
-                Resend verification email
+                {{ t("auth.resendVerification") }}
               </ULink>
             </div>
           </div>

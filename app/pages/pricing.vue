@@ -1,31 +1,31 @@
 <script setup lang="ts">
 import type { PricingTableSection, PricingTableTier } from "@nuxt/ui";
 
+const { t } = useI18n();
+
 definePageMeta({
   layout: "app",
-  title: "Pricing - JS.GS",
-  description: "Simple, transparent pricing for individuals and teams.",
 });
 
 const tiers: PricingTableTier[] = [
   {
     id: "free",
-    title: "Free",
-    description: "For individuals and small teams.",
-    price: "Free",
+    title: t("pricing.free"),
+    description: t("pricing.freeDesc"),
+    price: t("pricing.free"),
     button: {
-      label: "Get Started",
+      label: t("common.getStarted"),
       to: "/auth/sign-up",
       color: "primary",
     },
   },
   {
     id: "pro",
-    title: "Pro",
-    description: "For growing teams and businesses.",
-    price: "Coming Soon",
+    title: t("pricing.pro"),
+    description: t("pricing.proDesc"),
+    price: t("pricing.comingSoon"),
     button: {
-      label: "View on GitHub",
+      label: t("common.viewOnGithub"),
       to: "https://github.com/DemoMacro/JS.GS",
       target: "_blank",
       icon: "i-simple-icons-github",
@@ -36,11 +36,11 @@ const tiers: PricingTableTier[] = [
   },
   {
     id: "self-hosted",
-    title: "Self-Hosted",
-    description: "Complete control, unlimited scale.",
-    price: "Open Source",
+    title: t("pricing.selfHosted"),
+    description: t("pricing.selfHostedDesc"),
+    price: t("pricing.openSource"),
     button: {
-      label: "View on GitHub",
+      label: t("common.viewOnGithub"),
       to: "https://github.com/DemoMacro/JS.GS",
       target: "_blank",
       icon: "i-simple-icons-github",
@@ -51,223 +51,126 @@ const tiers: PricingTableTier[] = [
 
 const sections: PricingTableSection[] = [
   {
-    title: "Core Features",
+    title: t("pricing.coreFeatures"),
     features: [
       {
-        title: "All link features",
+        title: t("pricing.allLinkFeatures"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      {
+        title: t("pricing.allAnalyticsFeatures"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      {
+        title: t("pricing.qrCodeGeneration"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      { title: t("pricing.customDomains"), tiers: { free: true, pro: true, "self-hosted": true } },
+      {
+        title: t("pricing.geographicAnalytics"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      { title: t("pricing.utmTracking"), tiers: { free: true, pro: true, "self-hosted": true } },
+      { title: t("pricing.linkExpiration"), tiers: { free: true, pro: true, "self-hosted": true } },
+    ],
+  },
+  {
+    title: t("pricing.teamFeatures"),
+    features: [
+      {
+        title: t("pricing.allLinkFeatures"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      {
+        title: t("pricing.roleBasedAccess"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      { title: t("pricing.apiAccess"), tiers: { free: true, pro: true, "self-hosted": true } },
+    ],
+  },
+  {
+    title: t("pricing.infrastructure"),
+    features: [
+      { title: t("pricing.cloudHosting"), tiers: { free: true, pro: true, "self-hosted": false } },
+      {
+        title: t("pricing.selfHostedDeployment"),
+        tiers: { free: false, pro: false, "self-hosted": true },
+      },
+    ],
+  },
+  {
+    title: t("pricing.usageLimits"),
+    features: [
+      {
+        title: t("pricing.monthlyLinkClicks"),
         tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
+          free: t("pricing.unlimitedTemporarily"),
+          pro: t("pricing.unlimitedTemporarily"),
+          "self-hosted": t("pricing.unlimited"),
         },
       },
       {
-        title: "All analytics features",
+        title: t("pricing.teamMembers"),
         tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
+          free: t("pricing.unlimitedTemporarily"),
+          pro: t("pricing.unlimitedTemporarily"),
+          "self-hosted": t("pricing.unlimited"),
         },
       },
       {
-        title: "QR code generation",
+        title: t("pricing.allLinkFeatures"),
         tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
+          free: t("pricing.unlimitedTemporarily"),
+          pro: t("pricing.unlimitedTemporarily"),
+          "self-hosted": t("pricing.unlimited"),
         },
       },
       {
-        title: "Custom domains",
+        title: t("pricing.apiRequestsPerMonth"),
         tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
-        },
-      },
-      {
-        title: "Geographic analytics",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
-        },
-      },
-      {
-        title: "UTM tracking",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
-        },
-      },
-      {
-        title: "Link expiration",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
+          free: t("pricing.unlimitedTemporarily"),
+          pro: t("pricing.unlimitedTemporarily"),
+          "self-hosted": t("pricing.unlimited"),
         },
       },
     ],
   },
   {
-    title: "Team Features",
+    title: t("pricing.supportAndSource"),
     features: [
       {
-        title: "Organizations",
+        title: t("pricing.communitySupport"),
+        tiers: { free: true, pro: true, "self-hosted": true },
+      },
+      {
+        title: t("pricing.sourceCodeAccess"),
         tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
+          free: t("pricing.openSource"),
+          pro: t("pricing.openSource"),
+          "self-hosted": t("pricing.openSource"),
         },
       },
       {
-        title: "Role-based access control",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
-        },
-      },
-      {
-        title: "API access",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
-        },
-      },
-    ],
-  },
-  {
-    title: "Infrastructure",
-    features: [
-      {
-        title: "Cloud hosting",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": false,
-        },
-      },
-      {
-        title: "Self-hosted deployment",
-        tiers: {
-          free: false,
-          pro: false,
-          "self-hosted": true,
-        },
-      },
-    ],
-  },
-  {
-    title: "Usage Limits",
-    features: [
-      {
-        title: "Monthly link clicks",
-        tiers: {
-          free: "Unlimited (temporarily)",
-          pro: "Unlimited (temporarily)",
-          "self-hosted": "Unlimited",
-        },
-      },
-      {
-        title: "Team members",
-        tiers: {
-          free: "Unlimited (temporarily)",
-          pro: "Unlimited (temporarily)",
-          "self-hosted": "Unlimited",
-        },
-      },
-      {
-        title: "Organizations",
-        tiers: {
-          free: "Unlimited (temporarily)",
-          pro: "Unlimited (temporarily)",
-          "self-hosted": "Unlimited",
-        },
-      },
-      {
-        title: "API requests per month",
-        tiers: {
-          free: "Unlimited (temporarily)",
-          pro: "Unlimited (temporarily)",
-          "self-hosted": "Unlimited",
-        },
-      },
-    ],
-  },
-  {
-    title: "Support & Source",
-    features: [
-      {
-        title: "Community support",
-        tiers: {
-          free: true,
-          pro: true,
-          "self-hosted": true,
-        },
-      },
-      {
-        title: "Source code access",
-        tiers: {
-          free: "Open Source",
-          pro: "Open Source",
-          "self-hosted": "Open Source",
-        },
-      },
-      {
-        title: "Self-hosting documentation",
-        tiers: {
-          free: false,
-          pro: true,
-          "self-hosted": true,
-        },
+        title: t("pricing.selfHostingDocs"),
+        tiers: { free: false, pro: true, "self-hosted": true },
       },
     ],
   },
 ];
 
 const faqs = [
-  {
-    title: "What's the difference between plans?",
-    description:
-      "All plans have the same features. Free and Pro are cloud-hosted, Self-Hosted gives you complete control.",
-  },
-  {
-    title: "Is JS.GS really open source?",
-    description:
-      "Yes! JS.GS is 100% open source. All features are available in the self-hosted version completely free.",
-  },
-  {
-    title: "Why would I pay for the cloud version?",
-    description:
-      "We handle hosting, maintenance, and scaling. You get the same features without managing infrastructure.",
-  },
-  {
-    title: "Why choose Self-Hosted over cloud?",
-    description:
-      "Complete control over your data and infrastructure. Perfect for strict data sovereignty requirements.",
-  },
-  {
-    title: "How do I get started with Self-Hosted?",
-    description: "Check out our GitHub repository for deployment instructions and documentation.",
-  },
-  {
-    title: "Where can I report bugs or request features?",
-    description:
-      "Feel free to open issues on our GitHub repository. We welcome bug reports and feature suggestions!",
-  },
+  { title: t("pricing.faqDifference"), description: t("pricing.faqDifferenceDesc") },
+  { title: t("pricing.faqOpenSource"), description: t("pricing.faqOpenSourceDesc") },
+  { title: t("pricing.faqPayCloud"), description: t("pricing.faqPayCloudDesc") },
+  { title: t("pricing.faqSelfHostedVsCloud"), description: t("pricing.faqSelfHostedVsCloudDesc") },
+  { title: t("pricing.faqSelfHostedStart"), description: t("pricing.faqSelfHostedStartDesc") },
+  { title: t("pricing.faqBugs"), description: t("pricing.faqBugsDesc") },
 ];
 </script>
 
 <template>
   <div>
-    <UPageHero
-      title="Simple, Transparent Pricing"
-      description="Choose the plan that's right for you. All plans include our core link shortening features."
-    />
+    <UPageHero :title="t('pricing.title')" :description="t('pricing.description')" />
 
     <UContainer>
       <!-- Pricing Table -->
@@ -278,9 +181,9 @@ const faqs = [
       <!-- FAQ Section -->
       <div class="mb-16">
         <div class="mb-8 text-center">
-          <h2 class="mb-2 text-2xl font-bold">Frequently Asked Questions</h2>
+          <h2 class="mb-2 text-2xl font-bold">{{ t("pricing.faqTitle") }}</h2>
           <p class="text-muted-foreground">
-            Find answers to common questions about our pricing and plans.
+            {{ t("pricing.faqDescription") }}
           </p>
         </div>
         <UPageGrid>
@@ -298,18 +201,18 @@ const faqs = [
     <!-- CTA Section -->
     <UPageSection>
       <UPageCTA
-        title="Ready to Get Started?"
-        description="Join our community on GitHub and start shortening links today."
+        :title="t('home.ctaTitle')"
+        :description="t('pricing.ctaDescription')"
         :links="[
           {
-            label: 'View on GitHub',
+            label: t('common.viewOnGithub'),
             to: 'https://github.com/DemoMacro/JS.GS',
             icon: 'i-simple-icons-github',
             target: '_blank',
             color: 'neutral',
           },
           {
-            label: 'Star on GitHub',
+            label: t('pricing.starOnGithub'),
             to: 'https://github.com/DemoMacro/JS.GS/issues',
             color: 'neutral',
             variant: 'outline',

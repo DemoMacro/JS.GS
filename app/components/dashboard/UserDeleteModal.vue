@@ -4,6 +4,8 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   user: UserWithRole | null;
 }>();
@@ -20,7 +22,7 @@ const emit = defineEmits<{
 // Form schema
 const schema = z.object({
   confirmText: z.string().refine((val) => val === props.user?.email || val === props.user?.name, {
-    message: "Please enter the exact email or name to confirm deletion",
+    message: t("dashboard.enterUserConfirm"),
   }),
 });
 
@@ -34,8 +36,8 @@ const state = reactive<Partial<Schema>>({
 async function deleteUser() {
   if (!props.user?.id) {
     toast.add({
-      title: "Error",
-      description: "User ID is required for deletion",
+      title: t("common.error"),
+      description: t("dashboard.userIdRequired"),
       color: "error",
     });
     return;
@@ -49,16 +51,16 @@ async function deleteUser() {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to delete user",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToDeleteUser"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `User ${props.user.email} has been deleted successfully`,
+      title: t("common.success"),
+      description: t("dashboard.userDeleted", { email: props.user.email }),
       color: "success",
     });
 
@@ -69,8 +71,8 @@ async function deleteUser() {
     state.confirmText = "";
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred while deleting user",
+      title: t("common.error"),
+      description: t("dashboard.deleteUserError"),
       color: "error",
     });
   } finally {
@@ -82,23 +84,22 @@ async function deleteUser() {
 <template>
   <UModal
     v-model:open="open"
-    title="Delete User"
-    description="Confirm the permanent deletion of this user account"
+    :title="t('admin.deleteUser')"
+    :description="t('dashboard.confirmDeleteUserDesc')"
   >
     <slot />
 
     <template #body>
       <div class="space-y-4">
         <p class="text-muted-foreground">
-          This action cannot be undone. This will permanently delete the user account and remove all
-          their data.
+          {{ t("dashboard.cannotBeUndone") }} {{ t("dashboard.confirmDeleteUserDesc") }}
         </p>
 
         <UForm :schema="schema" :state="state" class="space-y-4" @submit="deleteUser">
           <UFormField
             name="confirmText"
-            :label="`Type '${props.user?.email || props.user?.name}' to confirm deletion`"
-            description="Please enter the exact email or name to confirm you want to delete this user"
+            :label="t('common.typeToConfirm', { name: props.user?.email || props.user?.name })"
+            :description="t('dashboard.enterUserConfirm')"
           >
             <UInput
               v-model="state.confirmText"
@@ -109,14 +110,16 @@ async function deleteUser() {
           </UFormField>
 
           <div class="flex justify-end gap-2">
-            <UButton variant="outline" @click="open = false" :disabled="loading"> Cancel </UButton>
+            <UButton variant="outline" @click="open = false" :disabled="loading">
+              {{ t("common.cancel") }}
+            </UButton>
             <UButton
               color="error"
               type="submit"
               :loading="loading"
               :disabled="state.confirmText !== (props.user?.email || props.user?.name)"
             >
-              Delete User
+              {{ t("admin.deleteUser") }}
             </UButton>
           </div>
         </UForm>

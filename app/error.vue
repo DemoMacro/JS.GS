@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import type { NuxtError } from "#app";
 
+const { t, locale } = useI18n();
+
 defineProps<{
   error: NuxtError;
 }>();
 
 useSeoMeta({
-  title: "Page not found",
-  description: "We are sorry but this page could not be found.",
+  title: () => t("common.pageNotFound"),
+  description: () => t("common.pageNotFoundDesc"),
 });
 
 useHead({
   htmlAttrs: {
-    lang: "en",
+    lang: locale.value,
   },
 });
 </script>

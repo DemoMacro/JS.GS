@@ -2,6 +2,8 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 
+const { t } = useI18n();
+
 const route = useRoute();
 const userId = route.params.id as string;
 const toast = useToast();
@@ -12,11 +14,11 @@ const { user, loading, updateUser, banUser, unbanUser, removeUser } = useUser(us
 // Password form schema
 const passwordSchema = z
   .object({
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z.string().min(8, "Please confirm password"),
+    newPassword: z.string().min(8, t("auth.passwordMin8")),
+    confirmPassword: z.string().min(8, t("admin.pleaseConfirmPassword")),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: t("auth.passwordsDontMatch"),
     path: ["confirmPassword"],
   });
 
@@ -36,8 +38,8 @@ const banForm = reactive({
 
 // Ban form schema
 const banSchema = z.object({
-  reason: z.string().min(1, "Ban reason is required"),
-  expiresIn: z.number().min(0, "Must be positive"),
+  reason: z.string().min(1, t("admin.banReasonRequired")),
+  expiresIn: z.number().min(0, t("admin.mustBePositive")),
 });
 
 type BanSchema = z.output<typeof banSchema>;
@@ -60,8 +62,8 @@ async function onSubmitPassword(event: FormSubmitEvent<PasswordSchema>) {
     });
 
     toast.add({
-      title: "Success",
-      description: "User password has been updated.",
+      title: t("common.success"),
+      description: t("admin.passwordUpdated"),
       icon: "i-lucide-check",
       color: "success",
     });
@@ -71,8 +73,8 @@ async function onSubmitPassword(event: FormSubmitEvent<PasswordSchema>) {
     passwordForm.confirmPassword = "";
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to update password",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("admin.failedToUpdatePassword"),
       color: "error",
     });
   }
@@ -85,8 +87,11 @@ const onSubmitBan = async (event: FormSubmitEvent<BanSchema>) => {
   try {
     await banUser(event.data.reason, event.data.expiresIn);
     toast.add({
-      title: "Success",
-      description: `User has been banned${event.data.expiresIn > 0 ? " for " + Math.floor(event.data.expiresIn / (60 * 60 * 24)) + " days" : ""}`,
+      title: t("common.success"),
+      description:
+        event.data.expiresIn > 0
+          ? t("admin.userBannedDays", { days: Math.floor(event.data.expiresIn / (60 * 60 * 24)) })
+          : t("admin.userBanned"),
       color: "success",
     });
 
@@ -95,8 +100,8 @@ const onSubmitBan = async (event: FormSubmitEvent<BanSchema>) => {
     banForm.expiresIn = 60 * 60 * 24 * 7;
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to ban user",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("admin.failedToBanUser"),
       color: "error",
     });
   }
@@ -109,14 +114,14 @@ const handleUnbanUser = async () => {
   try {
     await unbanUser();
     toast.add({
-      title: "Success",
-      description: "User has been unbanned.",
+      title: t("common.success"),
+      description: t("admin.userUnbanned"),
       color: "success",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to unban user",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("admin.failedToUnbanUser"),
       color: "error",
     });
   }
@@ -129,8 +134,8 @@ const handleDeleteUser = async () => {
   try {
     await removeUser();
     toast.add({
-      title: "Success",
-      description: "User has been removed permanently.",
+      title: t("common.success"),
+      description: t("admin.userRemoved"),
       color: "success",
     });
 
@@ -138,8 +143,8 @@ const handleDeleteUser = async () => {
     await navigateTo("/admin/users");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to remove user",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("admin.failedToRemoveUser"),
       color: "error",
     });
   }
@@ -160,8 +165,8 @@ async function fetchUserSessions() {
     }
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch user sessions",
+      title: t("common.error"),
+      description: t("admin.failedToFetchSessions"),
       color: "error",
     });
   } finally {
@@ -172,19 +177,15 @@ async function fetchUserSessions() {
 // Revoke session
 async function revokeSession(sessionId: string) {
   try {
-    // For individual session revocation, we may need to use a different approach
-    // as Better-Auth admin API expects sessionToken which might not be directly available
-    // For now, we'll show a message that this feature requires the session token
     toast.add({
-      title: "Info",
-      description:
-        "Individual session revocation requires session token. Use 'Revoke All' to terminate all sessions.",
+      title: t("admin.info"),
+      description: t("admin.revokeIndividualRequiresToken"),
       color: "info",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to revoke session",
+      title: t("common.error"),
+      description: t("admin.failedToRevokeSessions"),
       color: "error",
     });
   }
@@ -201,16 +202,16 @@ async function revokeAllSessions() {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to revoke sessions",
+        title: t("common.error"),
+        description: result.error.message || t("admin.failedToRevokeSessions"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: "All sessions revoked successfully",
+      title: t("common.success"),
+      description: t("admin.allSessionsRevoked"),
       color: "success",
     });
 
@@ -218,8 +219,8 @@ async function revokeAllSessions() {
     await fetchUserSessions();
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to revoke sessions",
+      title: t("common.error"),
+      description: t("admin.failedToRevokeSessions"),
       color: "error",
     });
   }
@@ -251,17 +252,17 @@ onMounted(() => {
   </div>
 
   <div v-else-if="!user" class="py-8 text-center">
-    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">User not found</h3>
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">{{ t("admin.userNotFound") }}</h3>
     <p class="text-muted-foreground mb-4">
-      The user you're looking for doesn't exist or you don't have permission to view it.
+      {{ t("admin.userNotFoundDesc") }}
     </p>
-    <UButton to="/admin/users">Back to Users</UButton>
+    <UButton to="/admin/users">{{ t("admin.backToUsers") }}</UButton>
   </div>
 
   <div v-else>
     <UPageCard
-      title="Update Password"
-      description="Set a new password for this user."
+      :title="t('admin.updatePassword')"
+      :description="t('admin.updatePasswordDesc')"
       variant="subtle"
     >
       <UForm
@@ -272,8 +273,8 @@ onMounted(() => {
       >
         <UFormField
           name="newPassword"
-          label="New Password"
-          description="Enter a new password for the user."
+          :label="t('admin.newPassword')"
+          :description="t('admin.enterNewPasswordDesc')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
@@ -282,8 +283,8 @@ onMounted(() => {
         <USeparator />
         <UFormField
           name="confirmPassword"
-          label="Confirm Password"
-          description="Confirm the new password."
+          :label="t('auth.confirmPassword')"
+          :description="t('admin.confirmNewPasswordDesc')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
@@ -295,22 +296,22 @@ onMounted(() => {
         </UFormField>
         <USeparator />
         <div class="flex justify-end pt-4">
-          <UButton type="submit" color="primary"> Update Password </UButton>
+          <UButton type="submit" color="primary"> {{ t("admin.updatePasswordBtn") }} </UButton>
         </div>
       </UForm>
     </UPageCard>
 
     <!-- Sessions Section -->
     <UPageCard
-      title="Sessions"
-      description="Manage active sessions across devices."
+      :title="t('admin.sessions')"
+      :description="t('admin.manageSessionsDesc')"
       variant="subtle"
       class="mt-6"
     >
       <div class="mb-4 flex items-center justify-between">
         <div class="text-muted-foreground text-sm">
           {{ sessions.filter((s) => getSessionStatus(s.expiresAt)).length }}
-          active sessions
+          {{ t("common.active").toLowerCase() }} {{ t("admin.sessions").toLowerCase() }}
         </div>
         <UButton
           variant="outline"
@@ -319,7 +320,7 @@ onMounted(() => {
           :disabled="sessions.length === 0"
         >
           <UIcon name="i-lucide-power" class="mr-2 size-4" />
-          Revoke All
+          {{ t("admin.revokeAll") }}
         </UButton>
       </div>
 
@@ -329,8 +330,10 @@ onMounted(() => {
 
       <div v-else-if="sessions.length === 0" class="py-8 text-center">
         <UIcon name="i-lucide-key-round" class="text-muted-foreground mx-auto mb-4 size-12" />
-        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">No sessions found</h3>
-        <p class="text-muted-foreground">This user doesn't have any active sessions.</p>
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">
+          {{ t("admin.noSessionsFound") }}
+        </h3>
+        <p class="text-muted-foreground">{{ t("admin.noSessionsUserDesc") }}</p>
       </div>
 
       <div v-else class="space-y-3">
@@ -344,9 +347,12 @@ onMounted(() => {
             <div class="flex items-center gap-3">
               <UIcon name="i-lucide-monitor" class="text-muted-foreground size-4" />
               <div>
-                <div class="text-sm font-medium">Session {{ session.id.slice(-8) }}</div>
+                <div class="text-sm font-medium">
+                  {{ t("admin.sessionLabel", { id: session.id.slice(-8) }) }}
+                </div>
                 <div class="text-muted-foreground text-xs">
-                  Created: {{ formatDate(session.createdAt) }} • Expires:
+                  {{ t("common.created") }}: {{ formatDate(session.createdAt) }} •
+                  {{ t("common.expires") }}:
                   {{ formatDate(session.expiresAt) }}
                 </div>
               </div>
@@ -357,7 +363,7 @@ onMounted(() => {
                 variant="soft"
                 size="sm"
               >
-                {{ getSessionStatus(session.expiresAt) ? "Active" : "Expired" }}
+                {{ getSessionStatus(session.expiresAt) ? t("common.active") : t("common.expired") }}
               </UBadge>
               <UButton
                 v-if="getSessionStatus(session.expiresAt)"
@@ -375,8 +381,7 @@ onMounted(() => {
     </UPageCard>
 
     <UPageCard
-      title="Account"
-      description="Manage this user's account and access. Some actions cannot be undone."
+      :title="t('admin.manageAccountDesc')"
       class="from-error/10 to-default mt-6 bg-gradient-to-tl from-5%"
     >
       <div class="space-y-4">
@@ -388,12 +393,12 @@ onMounted(() => {
           <div class="flex items-start gap-3">
             <UIcon name="i-lucide-alert-circle" class="mt-0.5 size-5 text-red-500" />
             <div class="flex-1">
-              <p class="font-medium text-red-900 dark:text-red-100">User is banned</p>
+              <p class="font-medium text-red-900 dark:text-red-100">{{ t("admin.userBanned") }}</p>
               <p v-if="user.banReason" class="mt-1 text-sm text-red-700 dark:text-red-300">
-                Reason: {{ user.banReason }}
+                {{ t("admin.banReasonLabel") }} {{ user.banReason }}
               </p>
               <p v-if="user.banExpires" class="mt-1 text-sm text-red-700 dark:text-red-300">
-                Expires: {{ new Date(user.banExpires).toLocaleString() }}
+                {{ t("common.expires") }}: {{ new Date(user.banExpires).toLocaleString() }}
               </p>
             </div>
           </div>
@@ -403,72 +408,82 @@ onMounted(() => {
         <div class="flex flex-wrap gap-3">
           <UButton v-if="!user.banned" @click="showBanModal = true" color="error" variant="outline">
             <UIcon name="i-lucide-ban" class="mr-2" />
-            Ban User
+            {{ t("admin.banUser") }}
           </UButton>
           <UButton v-else @click="handleUnbanUser" color="success" variant="outline">
             <UIcon name="i-lucide-user-check" class="mr-2" />
-            Unban User
+            {{ t("admin.unbanUser") }}
           </UButton>
           <DashboardUserDeleteModal :user="user">
-            <UButton label="Delete account" color="error" />
+            <UButton :label="t('common.delete')" color="error" />
           </DashboardUserDeleteModal>
         </div>
       </div>
     </UPageCard>
 
     <!-- Ban Modal -->
-    <UModal v-model="showBanModal" title="Ban User">
+    <UModal v-model="showBanModal" :title="t('admin.banUser')">
       <template #body>
         <UForm :schema="banSchema" :state="banForm" @submit="onSubmitBan" class="space-y-4">
           <UFormField
             name="reason"
-            label="Ban Reason"
-            description="Reason for banning this user."
+            :label="t('admin.banReason')"
+            :description="t('admin.banReasonDesc')"
             required
           >
-            <UTextarea v-model="banForm.reason" placeholder="Enter ban reason..." :rows="3" />
+            <UTextarea
+              v-model="banForm.reason"
+              :placeholder="t('admin.banReasonPlaceholder')"
+              :rows="3"
+            />
           </UFormField>
           <UFormField
             name="expiresIn"
-            label="Ban Duration"
-            description="How long the ban should last. Leave empty for permanent ban."
+            :label="t('admin.banDuration')"
+            :description="t('admin.banDurationDesc')"
           >
             <USelect
               v-model="banForm.expiresIn"
               :items="[
-                { label: 'Permanent', value: 0 },
-                { label: '1 hour', value: 3600 },
-                { label: '1 day', value: 86400 },
-                { label: '1 week', value: 604800 },
-                { label: '1 month', value: 2592000 },
+                { label: t('admin.permanent'), value: 0 },
+                { label: t('admin.1hour'), value: 3600 },
+                { label: t('admin.1day'), value: 86400 },
+                { label: t('admin.1week'), value: 604800 },
+                { label: t('admin.1month'), value: 2592000 },
               ]"
             />
           </UFormField>
           <div class="flex justify-end gap-3 pt-4">
-            <UButton variant="outline" @click="showBanModal = false"> Cancel </UButton>
-            <UButton type="submit" color="error"> Ban User </UButton>
+            <UButton variant="outline" @click="showBanModal = false">
+              {{ t("common.cancel") }}
+            </UButton>
+            <UButton type="submit" color="error"> {{ t("admin.banUser") }} </UButton>
           </div>
         </UForm>
       </template>
     </UModal>
 
     <!-- Delete Modal -->
-    <UModal v-model="showDeleteModal" title="Delete User">
+    <UModal v-model="showDeleteModal" :title="t('admin.deleteUser')">
       <template #body>
         <div class="space-y-4">
           <div class="flex items-start gap-3">
             <UIcon name="i-lucide-alert-triangle" class="mt-0.5 size-5 text-red-500" />
             <div class="flex-1">
-              <p class="font-medium text-red-900">Delete User Account</p>
+              <p class="font-medium text-red-900">{{ t("admin.deleteUser") }}</p>
               <p class="text-muted-foreground mt-1 text-sm">
-                This action cannot be undone. This will permanently delete all data associated with
-                {{ user.name || user.email }}.
+                {{ t("admin.deleteUserConfirm", { name: user.name || user.email }) }}
+              </p>
+              <p class="text-muted-foreground mt-1 text-sm">
+                {{ t("admin.cannotBeUndone") }}
               </p>
             </div>
           </div>
           <div class="flex justify-end gap-3 pt-4">
-            <UButton variant="outline" @click="showDeleteModal = false"> Cancel </UButton>
-            <UButton color="error" @click="handleDeleteUser"> Delete User </UButton>
+            <UButton variant="outline" @click="showDeleteModal = false">
+              {{ t("common.cancel") }}
+            </UButton>
+            <UButton color="error" @click="handleDeleteUser"> {{ t("admin.deleteUser") }} </UButton>
           </div>
         </div>
       </template>

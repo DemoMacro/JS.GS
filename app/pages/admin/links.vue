@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: "Links - Admin - JS.GS",
+  layout: "dashboard",
 });
 </script>
 

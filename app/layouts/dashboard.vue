@@ -3,6 +3,8 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 const route = useRoute();
 const toast = useToast();
 
@@ -10,9 +12,9 @@ const open = ref(false);
 
 const isAdmin = computed(() => route.path.startsWith("/admin"));
 
-const adminLinks = [
+const adminLinks = computed(() => [
   {
-    label: "Admin",
+    label: t("admin.title"),
     icon: "i-lucide-house",
     to: "/admin",
     onSelect: () => {
@@ -21,7 +23,7 @@ const adminLinks = [
     exact: true,
   },
   {
-    label: "Users",
+    label: t("admin.users"),
     icon: "i-lucide-users",
     to: "/admin/users",
     onSelect: () => {
@@ -29,7 +31,7 @@ const adminLinks = [
     },
   },
   {
-    label: "Organizations",
+    label: t("admin.organizations"),
     icon: "i-lucide-building",
     to: "/admin/orgs",
     onSelect: () => {
@@ -37,7 +39,7 @@ const adminLinks = [
     },
   },
   {
-    label: "Sessions",
+    label: t("admin.sessions"),
     icon: "i-lucide-activity",
     to: "/admin/sessions",
     onSelect: () => {
@@ -45,18 +47,18 @@ const adminLinks = [
     },
   },
   {
-    label: "Links",
+    label: t("admin.links"),
     icon: "i-lucide-link",
     to: "/admin/links",
     onSelect: () => {
       open.value = false;
     },
   },
-];
+]);
 
-const dashboardLinks = [
+const dashboardLinks = computed(() => [
   {
-    label: "Dashboard",
+    label: t("dashboard.title"),
     icon: "i-lucide-house",
     to: "/dashboard",
     onSelect: () => {
@@ -65,7 +67,7 @@ const dashboardLinks = [
     exact: true,
   },
   {
-    label: "Links",
+    label: t("admin.links"),
     icon: "i-lucide-link",
     to: "/dashboard/links",
     onSelect: () => {
@@ -73,48 +75,48 @@ const dashboardLinks = [
     },
   },
   {
-    label: "Domains",
+    label: t("dashboard.domains"),
     icon: "i-lucide-globe",
     to: "/dashboard/domains",
     onSelect: () => {
       open.value = false;
     },
   },
-];
+]);
 
 // Get active organization to conditionally show Organization link
 const activeOrgResult = authClient.useActiveOrganization();
 const hasActiveOrg = computed(() => !!activeOrgResult.value.data);
 
 // Add Organization link if there's an active organization
-const organizationLink = {
-  label: "Organization",
+const organizationLink = computed(() => ({
+  label: t("dashboard.org"),
   icon: "i-lucide-building",
   to: "/dashboard/org",
   onSelect: () => {
     open.value = false;
   },
-};
+}));
 
 const links = computed(() => {
-  const mainLinks = isAdmin.value ? adminLinks : dashboardLinks;
+  const mainLinks = isAdmin.value ? adminLinks.value : dashboardLinks.value;
 
   // Add Organization link to dashboard if there's an active organization
   const finalMainLinks = isAdmin.value
     ? mainLinks
-    : [...mainLinks, ...(hasActiveOrg.value ? [organizationLink] : [])];
+    : [...mainLinks, ...(hasActiveOrg.value ? [organizationLink.value] : [])];
 
   return [
     finalMainLinks,
     [
       {
-        label: "Feedback",
+        label: t("common.feedback"),
         icon: "i-lucide-message-circle",
         to: "https://github.com/DemoMacro/JS.GS/issues",
         target: "_blank",
       },
       {
-        label: "Help & Support",
+        label: t("common.helpAndSupport"),
         icon: "i-lucide-info",
         to: "https://github.com/DemoMacro/JS.GS",
         target: "_blank",
@@ -123,24 +125,42 @@ const links = computed(() => {
   ] satisfies NavigationMenuItem[][];
 });
 
+const { locale, locales, setLocale } = useI18n();
+
+const flags: Record<string, string> = { en: "🇺🇸", zh_cn: "🇨🇳" };
+
 const groups = computed(() => [
   {
     id: "links",
-    label: "Go to",
+    label: t("common.goTo"),
     items: links.value.flat(),
   },
   {
     id: "code",
-    label: "Code",
+    label: t("common.code"),
     items: [
       {
         id: "source",
-        label: "View page source",
+        label: t("common.viewPageSource"),
         icon: "i-simple-icons-github",
         to: `https://github.com/DemoMacro/JS.GS/blob/main/app/pages${route.path === "/" ? "/index" : route.path}.vue`,
         target: "_blank",
       },
     ],
+  },
+  {
+    id: "locale",
+    label: t("common.language"),
+    items: locales.value.map((l) => ({
+      id: l.code,
+      label: `${flags[l.code] || ""} ${l.name}`,
+      active: l.code === locale.value,
+      onSelect: () => {
+        if (l.code !== locale.value) {
+          setLocale(l.code);
+        }
+      },
+    })),
   },
 ]);
 
@@ -154,12 +174,12 @@ onMounted(async () => {
   }
 
   toast.add({
-    title: "We use first-party cookies to enhance your experience on our website.",
+    title: t("common.cookieConsent"),
     duration: 0,
     close: false,
     actions: [
       {
-        label: "Accept",
+        label: t("common.accept"),
         color: "neutral",
         variant: "outline",
         onClick: () => {
@@ -167,7 +187,7 @@ onMounted(async () => {
         },
       },
       {
-        label: "Opt out",
+        label: t("common.optOut"),
         color: "neutral",
         variant: "ghost",
       },

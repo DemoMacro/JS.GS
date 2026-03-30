@@ -5,6 +5,8 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   organization: Organization | null | undefined;
 }>();
@@ -20,9 +22,9 @@ const emit = defineEmits<{
 
 // Form schema
 const schema = z.object({
-  email: z.string().email("Invalid email"),
+  email: z.string().email(t("auth.invalidEmail")),
   role: z.enum(["owner", "admin", "member"]).refine((val) => val !== undefined, {
-    message: "Please select a role",
+    message: t("admin.pleaseSelectRole"),
   }),
 });
 
@@ -33,11 +35,17 @@ const state = reactive<Partial<Schema>>({
   role: "member",
 });
 
+const roleItems = computed(() => [
+  { label: t("common.member"), value: "member" },
+  { label: t("common.admin"), value: "admin" },
+  { label: t("common.owner"), value: "owner" },
+]);
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   if (!props.organization?.id) {
     toast.add({
-      title: "Error",
-      description: "Organization ID is required",
+      title: t("common.error"),
+      description: t("dashboard.orgIdRequired"),
       color: "error",
     });
     return;
@@ -53,16 +61,16 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to add member",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToAddMember"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `Member ${event.data.email} has been invited successfully`,
+      title: t("common.success"),
+      description: t("dashboard.memberInvited", { email: event.data.email }),
       color: "success",
     });
 
@@ -74,8 +82,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     state.role = "member";
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred while adding member",
+      title: t("common.error"),
+      description: t("dashboard.addMemberError"),
       color: "error",
     });
   } finally {
@@ -87,17 +95,17 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 <template>
   <UModal
     v-model:open="open"
-    title="Add Organization Member"
-    description="Invite a new member by email address."
+    :title="t('dashboard.addOrgMember')"
+    :description="t('dashboard.addOrgMemberDesc')"
   >
     <slot />
 
     <template #body>
       <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
         <UFormField
-          label="Email Address"
+          :label="t('auth.emailAddress')"
           name="email"
-          description="The email address of the user to add"
+          :description="t('dashboard.memberEmailDesc')"
         >
           <UInput
             v-model="state.email"
@@ -108,29 +116,24 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
           />
         </UFormField>
 
-        <UFormField label="Role" name="role" description="Select the role for this member">
-          <USelect
-            v-model="state.role"
-            :items="[
-              { label: 'Member', value: 'member' },
-              { label: 'Admin', value: 'admin' },
-              { label: 'Owner', value: 'owner' },
-            ]"
-            :disabled="loading"
-            class="w-full"
-          />
+        <UFormField
+          :label="t('common.role')"
+          name="role"
+          :description="t('dashboard.memberRoleDesc')"
+        >
+          <USelect v-model="state.role" :items="roleItems" :disabled="loading" class="w-full" />
         </UFormField>
 
         <div class="flex justify-end gap-2">
           <UButton
-            label="Cancel"
+            :label="t('common.cancel')"
             color="neutral"
             variant="outline"
             @click="open = false"
             :disabled="loading"
           />
           <UButton
-            label="Add Member"
+            :label="t('dashboard.addMember')"
             color="primary"
             type="submit"
             :loading="loading"

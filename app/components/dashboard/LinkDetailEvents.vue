@@ -6,6 +6,8 @@ import type { ClickEvent } from "~~/shared/types/analytics";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 interface Range {
   start: Date;
   end: Date;
@@ -102,8 +104,8 @@ const total = computed(() => eventsData.value?.total ?? 0);
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch events",
+      title: t("common.error"),
+      description: t("dashboard.failedToFetchEvents"),
       color: "error",
     });
   }
@@ -114,55 +116,55 @@ const BotBadge = {
   template: {
     render() {
       return h("span", { class: "inline-flex items-center gap-1" }, [
-        h("span", { class: "text-xs" }, "🤖"),
+        h("span", { class: "text-xs" }, "\u{1F916}"),
         h("span", { class: "text-xs font-mono" }, "BOT"),
       ]);
     },
   },
 };
 
-const columns: TableColumn<any>[] = [
+const columns = computed<TableColumn<any>[]>(() => [
   {
     accessorKey: "timestamp",
-    header: "Time",
+    header: t("dashboard.time"),
   },
   {
     accessorKey: "browserName",
-    header: "Browser",
+    header: t("dashboard.browser"),
   },
   {
     accessorKey: "osName",
-    header: "OS",
+    header: t("dashboard.os"),
   },
   {
     accessorKey: "deviceType",
-    header: "Device",
+    header: t("dashboard.device"),
   },
   {
     accessorKey: "country",
-    header: "Country",
+    header: t("dashboard.country"),
   },
   {
     accessorKey: "city",
-    header: "City",
+    header: t("dashboard.city"),
   },
   {
     accessorKey: "isp",
-    header: "ISP",
+    header: t("dashboard.isp"),
   },
   {
     accessorKey: "utmSource",
-    header: "UTM Source",
+    header: t("dashboard.utmSource"),
   },
   {
     accessorKey: "utmMedium",
-    header: "UTM Medium",
+    header: t("dashboard.utmMedium"),
   },
   {
     accessorKey: "utmCampaign",
-    header: "UTM Campaign",
+    header: t("dashboard.utmCampaign"),
   },
-];
+]);
 </script>
 
 <template>
@@ -173,17 +175,17 @@ const columns: TableColumn<any>[] = [
         v-model="globalFilter"
         class="max-w-sm"
         icon="i-lucide-search"
-        placeholder="Search events..."
+        :placeholder="t('dashboard.searchEvents')"
       />
 
       <div class="flex flex-wrap items-center gap-2">
         <USelect
           v-model="pagination.pageSize"
           :items="[
-            { label: '25 per page', value: 25 },
-            { label: '50 per page', value: 50 },
-            { label: '100 per page', value: 100 },
-            { label: '200 per page', value: 200 },
+            { label: t('dashboard.perPage', { count: 25 }), value: 25 },
+            { label: t('dashboard.perPage', { count: 50 }), value: 50 },
+            { label: t('dashboard.perPage', { count: 100 }), value: 100 },
+            { label: t('dashboard.perPage', { count: 200 }), value: 200 },
           ]"
           class="min-w-32"
         />

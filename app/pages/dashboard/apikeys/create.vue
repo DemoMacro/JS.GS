@@ -4,16 +4,18 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Create API Key - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
 const { copy, copied } = useClipboard();
 
 const schema = z.object({
-  name: z.string().min(1, "API Key name is required"),
-  expiresIn: z.number().min(3600, "Minimum 1 hour").max(31536000, "Maximum 1 year"),
+  name: z.string().min(1, t("dashboard.apiKeyNameDesc")),
+  expiresIn: z.number().min(3600, t("dashboard.1hour")).max(31536000, t("dashboard.1year")),
 });
 
 type Schema = z.output<typeof schema>;
@@ -36,8 +38,8 @@ async function createApiKey(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to create API key",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToCreateApiKey"),
         color: "error",
       });
       return;
@@ -50,14 +52,14 @@ async function createApiKey(event: FormSubmitEvent<Schema>) {
     };
 
     toast.add({
-      title: "Success",
-      description: `API Key "${event.data.name}" has been created successfully`,
+      title: t("common.success"),
+      description: t("dashboard.apiKeyCreatedSuccess", { name: event.data.name }),
       color: "success",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "An unexpected error occurred",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -75,18 +77,28 @@ function goToKeys() {
 watch(copied, (isCopied) => {
   if (isCopied) {
     toast.add({
-      title: "Success",
-      description: "API Key copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.apiKeyCopied"),
       color: "success",
     });
   }
 });
+
+// Expiration options
+const expirationItems = computed(() => [
+  { label: t("dashboard.1hour"), value: 3600 },
+  { label: t("dashboard.1day"), value: 86400 },
+  { label: t("dashboard.7days"), value: 604800 },
+  { label: t("dashboard.30days"), value: 2592000 },
+  { label: t("dashboard.90days"), value: 7776000 },
+  { label: t("dashboard.1year"), value: 31536000 },
+]);
 </script>
 
 <template>
   <UDashboardPanel id="create-api-key">
     <template #header>
-      <UDashboardNavbar title="Create API Key">
+      <UDashboardNavbar :title="t('dashboard.createApiKey')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -98,13 +110,15 @@ watch(copied, (isCopied) => {
         <!-- Show API Key after successful creation -->
         <div v-if="createdKey" class="space-y-4">
           <UPageCard
-            title="API Key Created Successfully"
-            description="Copy your API key now. You won't be able to see it again!"
+            :title="t('dashboard.apiKeyCreatedTitle')"
+            :description="t('dashboard.apiKeyCreatedDesc')"
             variant="subtle"
           >
             <div class="space-y-4">
               <div>
-                <label class="mb-2 block text-sm font-medium">Your API Key</label>
+                <label class="mb-2 block text-sm font-medium">{{
+                  t("dashboard.yourApiKey")
+                }}</label>
                 <div class="flex gap-2">
                   <UInput
                     :value="createdKey.key"
@@ -118,7 +132,7 @@ watch(copied, (isCopied) => {
                     variant="outline"
                     @click="copy(createdKey.key)"
                   >
-                    {{ copied ? "Copied!" : "Copy" }}
+                    {{ copied ? t("common.copied") : t("common.copy") }}
                   </UButton>
                 </div>
               </div>
@@ -126,8 +140,8 @@ watch(copied, (isCopied) => {
               <UAlert
                 icon="i-lucide-alert-triangle"
                 color="warning"
-                title="Save this API key securely"
-                description="For security reasons, we won't be able to show it to you again. Make sure to save it in a secure location."
+                :title="t('dashboard.saveApiKeySecurely')"
+                :description="t('dashboard.saveApiKeyWarning')"
               />
 
               <div class="flex gap-3 pt-4">
@@ -138,9 +152,9 @@ watch(copied, (isCopied) => {
                     state.name = '';
                   "
                 >
-                  Create Another
+                  {{ t("dashboard.createAnother") }}
                 </UButton>
-                <UButton @click="goToKeys"> Go to API Keys </UButton>
+                <UButton @click="goToKeys"> {{ t("dashboard.goToApiKeys") }} </UButton>
               </div>
             </div>
           </UPageCard>
@@ -149,17 +163,22 @@ watch(copied, (isCopied) => {
         <!-- Creation form -->
         <UForm v-else id="create-api-key" :schema="schema" :state="state" @submit="createApiKey">
           <UPageCard
-            title="Create API Key"
-            description="Create a new API key for programmatic access to your account."
+            :title="t('dashboard.createApiKey')"
+            :description="t('dashboard.apiKeyExpirationDesc')"
             variant="naked"
             orientation="horizontal"
             class="mb-4"
           >
             <div class="ms-auto flex gap-3">
               <UButton variant="outline" to="/dashboard/apikeys" :disabled="submitting">
-                Cancel
+                {{ t("common.cancel") }}
               </UButton>
-              <UButton label="Create API Key" color="primary" type="submit" :loading="submitting">
+              <UButton
+                :label="t('dashboard.createApiKey')"
+                color="primary"
+                type="submit"
+                :loading="submitting"
+              >
                 <template #leading>
                   <UIcon name="i-lucide-plus" />
                 </template>
@@ -170,14 +189,14 @@ watch(copied, (isCopied) => {
           <UPageCard variant="subtle">
             <UFormField
               name="name"
-              label="Name"
-              description="Give your API key a meaningful name to help you identify it later."
+              :label="t('common.name')"
+              :description="t('dashboard.apiKeyNameDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <UInput
                 v-model="state.name"
-                placeholder="e.g., Production App"
+                :placeholder="t('dashboard.apiKeyNamePlaceholder')"
                 :disabled="submitting"
                 class="w-full"
               />
@@ -187,21 +206,14 @@ watch(copied, (isCopied) => {
 
             <UFormField
               name="expiresIn"
-              label="Expiration"
-              description="Set how long this API key should remain valid. After expiration, it will no longer work."
+              :label="t('dashboard.apiKeyExpiration')"
+              :description="t('dashboard.apiKeyExpirationDesc')"
               required
               class="flex items-start justify-between gap-4 max-sm:flex-col"
             >
               <USelect
                 v-model="state.expiresIn"
-                :items="[
-                  { label: '1 hour', value: 3600 },
-                  { label: '1 day', value: 86400 },
-                  { label: '7 days', value: 604800 },
-                  { label: '30 days', value: 2592000 },
-                  { label: '90 days', value: 7776000 },
-                  { label: '1 year', value: 31536000 },
-                ]"
+                :items="expirationItems"
                 :disabled="submitting"
                 class="w-full sm:max-w-xs"
               />
@@ -210,12 +222,12 @@ watch(copied, (isCopied) => {
             <USeparator />
 
             <div>
-              <h4 class="mb-2 font-medium">Important Notes</h4>
+              <h4 class="mb-2 font-medium">{{ t("dashboard.importantNotes") }}</h4>
               <ul class="text-muted-foreground space-y-1 text-sm">
-                <li>• API keys inherit your account permissions automatically</li>
-                <li>• You can only view the full API key once immediately after creation</li>
-                <li>• Treat API keys like passwords - keep them secure and never share them</li>
-                <li>• Delete unused API keys to maintain account security</li>
+                <li>{{ t("dashboard.apiKeyNote1") }}</li>
+                <li>{{ t("dashboard.apiKeyNote2") }}</li>
+                <li>{{ t("dashboard.apiKeyNote3") }}</li>
+                <li>{{ t("dashboard.apiKeyNote4") }}</li>
               </ul>
             </div>
           </UPageCard>

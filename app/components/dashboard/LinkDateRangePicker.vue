@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { DateFormatter, getLocalTimeZone, CalendarDate, today } from "@internationalized/date";
 
+const { t } = useI18n();
+
 interface Range {
   start: Date;
   end: Date;
@@ -12,14 +14,14 @@ const df = new DateFormatter("en-US", {
 
 const selected = defineModel<Range>({ required: true });
 
-const ranges = [
-  { label: "Last 7 days", days: 7 },
-  { label: "Last 14 days", days: 14 },
-  { label: "Last 30 days", days: 30 },
-  { label: "Last 3 months", months: 3 },
-  { label: "Last 6 months", months: 6 },
-  { label: "Last year", years: 1 },
-];
+const ranges = computed(() => [
+  { label: t("dashboard.last7Days"), days: 7 },
+  { label: t("dashboard.last14Days"), days: 14 },
+  { label: t("dashboard.last30Days"), days: 30 },
+  { label: t("dashboard.last3Months"), months: 3 },
+  { label: t("dashboard.last6Months"), months: 6 },
+  { label: t("dashboard.lastYear"), years: 1 },
+]);
 
 const toCalendarDate = (date: Date) => {
   return new CalendarDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
@@ -96,7 +98,7 @@ const selectRange = (range: { days?: number; months?: number; years?: number }) 
             {{ df.format(selected.start) }}
           </template>
         </template>
-        <template v-else> Pick a date </template>
+        <template v-else> {{ t("dashboard.pickDate") }} </template>
       </span>
 
       <template #trailing>

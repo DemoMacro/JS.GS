@@ -2,6 +2,8 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import * as z from "zod";
 
+const { t } = useI18n();
+
 const route = useRoute();
 const userId = route.params.id as string;
 const toast = useToast();
@@ -11,12 +13,12 @@ const { user, loading, updateUser } = useUser(userId);
 
 // Form schema matching Nuxt UI dashboard settings
 const profileSchema = z.object({
-  name: z.string().min(2, "Too short"),
-  email: z.string().email("Invalid email"),
+  name: z.string().min(2, t("admin.tooShort")),
+  email: z.string().email(t("auth.invalidEmail")),
   role: z.enum(["user", "admin"]).refine((val) => val !== undefined, {
-    message: "Please select a role",
+    message: t("admin.pleaseSelectRole"),
   }),
-  image: z.string().url("Invalid URL").optional().or(z.literal("")),
+  image: z.string().url(t("admin.invalidUrl")).optional().or(z.literal("")),
   emailVerified: z.boolean().optional(),
 });
 
@@ -41,15 +43,15 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
   try {
     await updateUser(event.data);
     toast.add({
-      title: "Success",
-      description: "User profile has been updated.",
+      title: t("common.success"),
+      description: t("admin.userProfileUpdated"),
       icon: "i-lucide-check",
       color: "success",
     });
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: error instanceof Error ? error.message : "Failed to update user",
+      title: t("common.error"),
+      description: error instanceof Error ? error.message : t("admin.failedToUpdateUser"),
       color: "error",
     });
   }
@@ -62,18 +64,18 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
   </div>
 
   <div v-else-if="!user" class="py-8 text-center">
-    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">User not found</h3>
+    <h3 class="text-muted-foreground mb-2 text-lg font-semibold">{{ t("admin.userNotFound") }}</h3>
     <p class="text-muted-foreground mb-4">
-      The user you're looking for doesn't exist or you don't have permission to view it.
+      {{ t("admin.userNotFoundDesc") }}
     </p>
-    <UButton to="/admin/users">Back to Users</UButton>
+    <UButton to="/admin/users">{{ t("admin.backToUsers") }}</UButton>
   </div>
 
   <div v-else>
     <UForm id="settings" :schema="profileSchema" :state="profile" @submit="onSubmit">
       <UPageCard
-        title="Profile"
-        description="These informations will be displayed publicly."
+        :title="t('admin.profile')"
+        :description="t('admin.profilePublicInfo')"
         variant="naked"
         orientation="horizontal"
         class="mb-4"
@@ -81,19 +83,24 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <div class="flex w-fit gap-3 lg:ms-auto">
           <UButton
             :to="`/admin/users/${userId}/security`"
-            label="Security Settings"
+            :label="t('admin.securitySettingsBtn')"
             color="neutral"
             variant="outline"
           />
-          <UButton form="settings" label="Save changes" color="neutral" type="submit" />
+          <UButton
+            form="settings"
+            :label="t('dashboard.saveChanges')"
+            color="neutral"
+            type="submit"
+          />
         </div>
       </UPageCard>
 
       <UPageCard variant="subtle">
         <UFormField
           name="name"
-          label="Name"
-          description="Will appear on receipts, invoices, and other communication."
+          :label="t('common.name')"
+          :description="t('admin.nameDisplayDesc')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
@@ -102,8 +109,8 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <USeparator />
         <UFormField
           name="email"
-          label="Email"
-          description="This is your email address."
+          :label="t('common.email')"
+          :description="t('admin.thisIsEmail')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
@@ -112,21 +119,21 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <USeparator />
         <UFormField
           name="image"
-          label="Avatar URL"
-          description="URL to user's profile image."
+          :label="t('admin.avatarUrl')"
+          :description="t('admin.avatarUrlDescUser')"
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UInput
             v-model="profile.image"
-            placeholder="https://example.com/avatar.jpg"
+            :placeholder="t('admin.avatarPlaceholder')"
             autocomplete="off"
           />
         </UFormField>
         <USeparator />
         <UFormField
           name="emailVerified"
-          label="Email Verified"
-          description="Whether the user's email has been verified."
+          :label="t('admin.emailVerified')"
+          :description="t('admin.emailVerifiedDesc')"
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <UCheckbox v-model="profile.emailVerified" />
@@ -134,16 +141,16 @@ const onSubmit = async (event: FormSubmitEvent<ProfileSchema>) => {
         <USeparator />
         <UFormField
           name="role"
-          label="Role"
-          description="User role determines access permissions."
+          :label="t('common.role')"
+          :description="t('admin.roleAccessDesc')"
           required
           class="flex items-start justify-between gap-4 max-sm:flex-col"
         >
           <USelect
             v-model="profile.role"
             :items="[
-              { label: 'User', value: 'user' },
-              { label: 'Admin', value: 'admin' },
+              { label: t('common.user'), value: 'user' },
+              { label: t('common.admin'), value: 'admin' },
             ]"
             class="w-full"
           />

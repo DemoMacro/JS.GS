@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
-import { getPaginationRowModel } from "@tanstack/table-core";
 import type { LinkWithDetails } from "~~/shared/types/link";
 
 import { useDomains } from "~/composables/useDomains";
 import { authClient } from "~/utils/auth";
+
+const { t } = useI18n();
 
 interface Props {
   /**
@@ -75,8 +76,8 @@ function getLinkDomain(link: LinkWithDetails) {
 watch(copied, (isCopied) => {
   if (isCopied) {
     toast.add({
-      title: "Success",
-      description: "Link copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.linkCopied"),
       color: "success",
     });
   }
@@ -85,8 +86,8 @@ watch(copied, (isCopied) => {
 async function copyToClipboard(link: LinkWithDetails) {
   if (!isSupported.value) {
     toast.add({
-      title: "Error",
-      description: "Clipboard not supported in this browser",
+      title: t("common.error"),
+      description: t("dashboard.clipboardNotSupported"),
       color: "error",
     });
     return;
@@ -146,8 +147,8 @@ const total = computed(() => linksData.value?.total ?? 0);
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch links",
+      title: t("common.error"),
+      description: t("dashboard.failedToFetchLinks"),
       color: "error",
     });
   }
@@ -157,23 +158,23 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
   const baseColumns: TableColumn<LinkWithDetails>[] = [
     {
       accessorKey: "title",
-      header: "Title",
+      header: t("dashboard.linkTitleField"),
     },
     {
       accessorKey: "shortLink",
-      header: "Short Link",
+      header: t("dashboard.shortLink"),
     },
     {
       accessorKey: "originalUrl",
-      header: "Destination URL",
+      header: t("dashboard.destinationUrl"),
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: t("common.status"),
     },
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: t("common.actions"),
     },
   ];
 
@@ -182,7 +183,7 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
   if (shouldShowCreatedBy) {
     baseColumns.splice(2, 0, {
       accessorKey: "createdBy",
-      header: "Created By",
+      header: t("dashboard.createdBy"),
     });
   }
 
@@ -190,7 +191,7 @@ const columns = computed<TableColumn<LinkWithDetails>[]>(() => {
   if (props.mode === "admin") {
     baseColumns.splice(2, 0, {
       accessorKey: "organization",
-      header: "Organization",
+      header: t("dashboard.org"),
     });
   }
 
@@ -211,11 +212,15 @@ const emit = defineEmits<{
         v-model="globalFilter"
         class="max-w-sm"
         icon="i-lucide-search"
-        placeholder="Search by title, short code, or URL..."
+        :placeholder="t('dashboard.searchLinks')"
       />
 
       <div class="flex flex-wrap items-center gap-2">
-        <UButton v-if="mode === 'organization'" to="/dashboard/links/create" label="Add Link">
+        <UButton
+          v-if="mode === 'organization'"
+          to="/dashboard/links/create"
+          :label="t('dashboard.addLink')"
+        >
           <template #leading>
             <UIcon name="i-lucide-plus" />
           </template>
@@ -224,10 +229,10 @@ const emit = defineEmits<{
         <USelect
           v-model="pagination.pageSize"
           :items="[
-            { label: '10 per page', value: 10 },
-            { label: '25 per page', value: 25 },
-            { label: '50 per page', value: 50 },
-            { label: '100 per page', value: 100 },
+            { label: t('dashboard.perPage', { count: 10 }), value: 10 },
+            { label: t('dashboard.perPage', { count: 25 }), value: 25 },
+            { label: t('dashboard.perPage', { count: 50 }), value: 50 },
+            { label: t('dashboard.perPage', { count: 100 }), value: 100 },
           ]"
           class="min-w-32"
         />
@@ -243,7 +248,7 @@ const emit = defineEmits<{
         v-model:row-selection="rowSelection"
         v-model:pagination="pagination"
         :pagination-options="{
-          getPaginationRowModel: getPaginationRowModel(),
+          manualPagination: true,
         }"
         :data="links"
         :columns="columns"
@@ -271,7 +276,7 @@ const emit = defineEmits<{
               variant="ghost"
               size="xs"
               icon="i-lucide-copy"
-              title="Copy Link"
+              :title="t('dashboard.copyLink')"
               @click="copyToClipboard(row.original)"
             />
           </div>
@@ -285,8 +290,8 @@ const emit = defineEmits<{
             <span class="text-sm">
               {{
                 row.original.createdBy === currentUserId
-                  ? "You"
-                  : row.original.creator?.name || "Unknown"
+                  ? t("common.you")
+                  : row.original.creator?.name || t("common.unknown")
               }}
             </span>
           </div>
@@ -296,7 +301,7 @@ const emit = defineEmits<{
           <UBadge v-if="row.original.organization" size="sm" variant="subtle">
             {{ row.original.organization.name }}
           </UBadge>
-          <span v-else class="text-muted-foreground text-sm">No Organization</span>
+          <span v-else class="text-muted-foreground text-sm">{{ t("common.noOrganization") }}</span>
         </template>
 
         <template #originalUrl-cell="{ row }">
@@ -324,11 +329,11 @@ const emit = defineEmits<{
               "
               variant="ghost"
               icon="i-lucide-eye"
-              title="View Details"
+              :title="t('common.viewDetails')"
             />
 
             <UPopover>
-              <UButton variant="ghost" icon="i-lucide-qr-code" title="Show QR Code" />
+              <UButton variant="ghost" icon="i-lucide-qr-code" :title="t('dashboard.showQrCode')" />
 
               <template #content>
                 <div class="p-4">
@@ -350,7 +355,12 @@ const emit = defineEmits<{
                 }
               "
             >
-              <UButton variant="ghost" icon="i-lucide-trash" color="error" title="Delete Link" />
+              <UButton
+                variant="ghost"
+                icon="i-lucide-trash"
+                color="error"
+                :title="t('dashboard.deleteLink')"
+              />
             </DashboardLinkDeleteModal>
           </div>
         </template>
@@ -360,16 +370,25 @@ const emit = defineEmits<{
     <!-- Pagination Footer -->
     <div class="border-default mt-auto flex items-center justify-between gap-3 border-t pt-4">
       <div class="text-muted-foreground text-sm">
-        Showing
-        {{ table?.tableApi?.getFilteredRowModel().rows.length ?? 0 }} of {{ total }} links
+        {{
+          t("dashboard.showing", {
+            from: pagination.pageIndex * pagination.pageSize + 1,
+            to: Math.min((pagination.pageIndex + 1) * pagination.pageSize, total),
+            total,
+          })
+        }}
       </div>
 
       <div class="flex items-center gap-1.5">
         <UPagination
-          :default-page="(table?.tableApi?.getState().pagination.pageIndex ?? 0) + 1"
-          :items-per-page="table?.tableApi?.getState().pagination.pageSize"
-          :total="table?.tableApi?.getFilteredRowModel().rows.length ?? 0"
-          @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+          :page="pagination.pageIndex + 1"
+          :items-per-page="pagination.pageSize"
+          :total="total"
+          @update:page="
+            (p: number) => {
+              pagination.pageIndex = p - 1;
+            }
+          "
         />
       </div>
     </div>

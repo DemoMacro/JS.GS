@@ -4,6 +4,8 @@ import type { Domain } from "~~/shared/types/domain";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   domain: Domain | null;
 }>();
@@ -19,7 +21,7 @@ const loading = ref(false);
 
 const schema = z.object({
   confirmText: z.string().refine((val) => val === props.domain?.domainName, {
-    message: "Please enter domain name to confirm deletion",
+    message: t("dashboard.enterDomainConfirm"),
   }),
 });
 
@@ -32,8 +34,8 @@ const state = reactive<Partial<Schema>>({
 async function deleteDomain() {
   if (!props.domain?.id) {
     toast.add({
-      title: "Error",
-      description: "Domain ID is required",
+      title: t("common.error"),
+      description: t("dashboard.domainIdRequired"),
       color: "error",
     });
     return;
@@ -47,16 +49,16 @@ async function deleteDomain() {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to delete domain",
+        title: t("common.error"),
+        description: result.error.message || t("dashboard.failedToCreateDomain"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `Domain ${props.domain.domainName} has been deleted`,
+      title: t("common.success"),
+      description: t("dashboard.domainDeleted", { name: props.domain.domainName }),
       color: "success",
     });
 
@@ -65,8 +67,8 @@ async function deleteDomain() {
     state.confirmText = "";
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -76,20 +78,25 @@ async function deleteDomain() {
 </script>
 
 <template>
-  <UModal v-model:open="open" title="Delete Domain" description="This action cannot be undone">
+  <UModal
+    v-model:open="open"
+    :title="t('dashboard.deleteDomain')"
+    :description="t('dashboard.cannotBeUndone')"
+  >
     <slot />
 
     <template #body>
       <div class="space-y-4">
-        <UAlert v-if="domain" color="error" icon="i-lucide-alert-triangle" title="Warning">
+        <UAlert
+          v-if="domain"
+          color="error"
+          icon="i-lucide-alert-triangle"
+          :title="t('common.warning')"
+        >
           <template #description>
             <div class="space-y-1">
-              <p>You are about to delete the domain:</p>
+              <p>{{ t("dashboard.confirmDeleteDomainDesc") }}</p>
               <p class="font-mono text-sm font-semibold">{{ domain.domainName }}</p>
-              <p class="text-xs">
-                This action cannot be undone. All links associated with this domain will need to be
-                reassigned before deletion.
-              </p>
             </div>
           </template>
         </UAlert>
@@ -97,8 +104,8 @@ async function deleteDomain() {
         <UForm :schema="schema" :state="state" class="space-y-4" @submit="deleteDomain">
           <UFormField
             name="confirmText"
-            :label="`Type '${domain?.domainName}' to confirm`"
-            description="Please enter the domain name to confirm deletion"
+            :label="t('common.typeToConfirm', { name: domain?.domainName })"
+            :description="t('dashboard.enterDomainConfirm')"
           >
             <UInput
               v-model="state.confirmText"
@@ -109,7 +116,9 @@ async function deleteDomain() {
           </UFormField>
 
           <div class="flex justify-end gap-2">
-            <UButton variant="outline" @click="open = false" :disabled="loading"> Cancel </UButton>
+            <UButton variant="outline" @click="open = false" :disabled="loading">
+              {{ t("common.cancel") }}
+            </UButton>
             <UButton
               color="error"
               type="submit"
@@ -119,7 +128,7 @@ async function deleteDomain() {
               <template #leading>
                 <UIcon name="i-lucide-trash" />
               </template>
-              Delete Domain
+              {{ t("dashboard.deleteDomain") }}
             </UButton>
           </div>
         </UForm>

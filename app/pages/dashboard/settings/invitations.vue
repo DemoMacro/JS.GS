@@ -3,8 +3,10 @@ import type { Invitation } from "better-auth/plugins";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Invitations - Settings - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
@@ -29,8 +31,8 @@ async function fetchInvitations() {
     invitations.value = result.data || [];
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch invitations",
+      title: t("common.error"),
+      description: t("dashboard.failedToFetchInvitations"),
       color: "error",
     });
   } finally {
@@ -50,15 +52,15 @@ async function acceptInvitation(invitationId: string) {
     }
 
     toast.add({
-      title: "Success",
-      description: "Invitation accepted successfully",
+      title: t("common.success"),
+      description: t("dashboard.invitationAccepted"),
       color: "success",
     });
 
     await fetchInvitations();
   } catch (error: any) {
     toast.add({
-      title: "Error",
+      title: t("common.error"),
       description: error.message || "Failed to accept invitation",
       color: "error",
     });
@@ -77,15 +79,15 @@ async function declineInvitation(invitationId: string) {
     }
 
     toast.add({
-      title: "Success",
-      description: "Invitation declined",
+      title: t("common.success"),
+      description: t("dashboard.invitationDeclined"),
       color: "success",
     });
 
     await fetchInvitations();
   } catch (error: any) {
     toast.add({
-      title: "Error",
+      title: t("common.error"),
       description: error.message || "Failed to decline invitation",
       color: "error",
     });
@@ -120,7 +122,7 @@ function formatDate(date: Date | string) {
     >
       <template #header>
         <div class="flex w-full items-center justify-between">
-          <h3 class="text-lg font-semibold">Organization Invitations</h3>
+          <h3 class="text-lg font-semibold">{{ t("dashboard.orgInvitations") }}</h3>
           <UButton
             icon="i-lucide-refresh-ccw"
             variant="ghost"
@@ -139,8 +141,8 @@ function formatDate(date: Date | string) {
       <!-- Empty State -->
       <div v-else-if="invitations.length === 0" class="py-8 text-center">
         <UIcon name="i-lucide-mail" class="text-muted mx-auto mb-4 size-12" />
-        <h3 class="mb-2 text-lg font-semibold">No invitations</h3>
-        <p class="text-muted text-sm">You don't have any organization invitations.</p>
+        <h3 class="mb-2 text-lg font-semibold">{{ t("dashboard.noInvitations") }}</h3>
+        <p class="text-muted text-sm">{{ t("dashboard.noInvitationsDesc") }}</p>
       </div>
 
       <!-- Invitations List -->
@@ -160,7 +162,8 @@ function formatDate(date: Date | string) {
                 {{ invitation.organizationName }}
               </p>
               <p class="text-muted truncate">
-                Role: {{ invitation.role }} • Invited: {{ formatDate(invitation.createdAt) }}
+                {{ t("common.role") }}: {{ invitation.role }} • {{ t("dashboard.invited") }}:
+                {{ formatDate(invitation.createdAt) }}
               </p>
             </div>
           </div>
@@ -177,7 +180,13 @@ function formatDate(date: Date | string) {
               variant="subtle"
               size="sm"
             >
-              {{ invitation.status }}
+              {{
+                invitation.status === "accepted"
+                  ? t("common.accepted")
+                  : invitation.status === "rejected"
+                    ? t("common.rejected")
+                    : invitation.status
+              }}
             </UBadge>
 
             <template v-if="invitation.status === 'pending'">
@@ -187,9 +196,11 @@ function formatDate(date: Date | string) {
                 variant="outline"
                 @click="declineInvitation(invitation.id)"
               >
-                Decline
+                {{ t("common.decline") }}
               </UButton>
-              <UButton size="xs" @click="acceptInvitation(invitation.id)"> Accept </UButton>
+              <UButton size="xs" @click="acceptInvitation(invitation.id)">
+                {{ t("common.accept") }}
+              </UButton>
             </template>
           </div>
         </li>

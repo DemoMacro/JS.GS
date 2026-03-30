@@ -5,6 +5,8 @@ import * as z from "zod";
 import { useDomains } from "~/composables/useDomains";
 import { useOrganizations } from "~/composables/useOrganizations";
 
+const { t } = useI18n();
+
 interface Props {
   schema: z.ZodObject<any>;
   state: Partial<Record<string, any>>;
@@ -31,14 +33,20 @@ const organizationOptions = computed(() =>
     value: org.id,
   })),
 );
+
+const statusItems = computed(() => [
+  { label: t("common.active"), value: "active" },
+  { label: t("common.inactive"), value: "inactive" },
+  { label: t("common.expired"), value: "expired" },
+]);
 </script>
 
 <template>
   <UPageCard variant="subtle" class="mb-4">
     <UFormField
       name="organizationId"
-      label="Organization"
-      description="Select the organization for this link"
+      :label="t('dashboard.org')"
+      :description="t('dashboard.selectOrgForDomain')"
       class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <USelect
@@ -54,14 +62,14 @@ const organizationOptions = computed(() =>
 
     <UFormField
       name="originalUrl"
-      label="Destination URL"
-      description="The full URL you want to shorten (e.g., https://example.com/very-long-url)."
+      :label="t('dashboard.destinationUrl')"
+      :description="t('dashboard.destinationUrlDesc')"
       required
       class="flex flex-col gap-2"
     >
       <UInput
         v-model="state.originalUrl"
-        placeholder="https://example.com/very-long-url"
+        :placeholder="t('dashboard.destinationUrlPlaceholder')"
         :disabled="submitting"
         class="w-full"
       />
@@ -71,15 +79,15 @@ const organizationOptions = computed(() =>
 
     <UFormField
       name="domainId"
-      label="Custom Domain (Optional)"
-      description="Select a verified custom domain for this link"
+      :label="t('dashboard.customDomain')"
+      :description="t('dashboard.customDomainDesc')"
       class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <USelect
         v-if="domainOptions.length > 0"
         v-model="state.domainId"
         :items="domainOptions"
-        placeholder="Default"
+        :placeholder="t('dashboard.default')"
         icon="i-lucide-globe"
         :disabled="submitting || domainsLoading"
         class="w-48"
@@ -90,13 +98,13 @@ const organizationOptions = computed(() =>
 
     <UFormField
       name="title"
-      label="Title"
-      description="A descriptive title for your link (optional)."
+      :label="t('dashboard.linkTitleField')"
+      :description="t('dashboard.linkTitleDesc')"
       class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <UInput
         v-model="state.title"
-        placeholder="My Awesome Link"
+        :placeholder="t('dashboard.linkTitlePlaceholder')"
         :disabled="submitting"
         class="w-48"
       />
@@ -106,13 +114,13 @@ const organizationOptions = computed(() =>
 
     <UFormField
       name="description"
-      label="Description"
-      description="Additional details about this link (optional)."
+      :label="t('dashboard.linkDescriptionField')"
+      :description="t('dashboard.linkDescriptionDesc')"
       class="flex flex-col gap-2"
     >
       <UTextarea
         v-model="state.description"
-        placeholder="A brief description of where this link leads to"
+        :placeholder="t('dashboard.linkDescriptionPlaceholder')"
         :disabled="submitting"
         :rows="3"
         class="w-full"
@@ -123,18 +131,14 @@ const organizationOptions = computed(() =>
 
     <UFormField
       name="status"
-      label="Status"
-      description="Control whether this link is active"
+      :label="t('dashboard.linkStatus')"
+      :description="t('dashboard.linkStatusDesc')"
       required
       class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <USelect
         v-model="state.status"
-        :items="[
-          { label: 'Active', value: 'active' },
-          { label: 'Inactive', value: 'inactive' },
-          { label: 'Expired', value: 'expired' },
-        ]"
+        :items="statusItems"
         :disabled="submitting"
         class="w-full sm:max-w-xs"
       />
@@ -144,8 +148,8 @@ const organizationOptions = computed(() =>
 
     <UFormField
       name="expiresAt"
-      label="Expiration Date"
-      description="Optionally set when this link should expire (optional)."
+      :label="t('dashboard.expirationDate')"
+      :description="t('dashboard.expirationDateDesc')"
       class="flex items-start justify-between gap-4 max-sm:flex-col"
     >
       <UInput

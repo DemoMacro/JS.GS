@@ -5,68 +5,66 @@ import * as z from "zod";
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
+const { t } = useI18n();
 
 definePageMeta({
-  title: "Sign Up - JS.GS",
+  layout: "app",
 });
 
-const fields: AuthFormField[] = [
+const fields = computed<AuthFormField[]>(() => [
   {
     name: "name",
     type: "text",
-    label: "Full Name",
+    label: t("auth.fullName"),
     required: true,
   },
   {
     name: "username",
     type: "text",
-    label: "Username",
+    label: t("common.username"),
     required: true,
   },
   {
     name: "email",
     type: "email",
-    label: "Email",
+    label: t("common.email"),
     required: true,
   },
   {
     name: "password",
-    label: "Password",
+    label: t("common.password"),
     type: "password",
     required: true,
   },
   {
     name: "confirmPassword",
-    label: "Confirm Password",
+    label: t("auth.confirmPassword"),
     type: "password",
     required: true,
   },
   {
     name: "terms",
-    label: "I agree to the Terms of Service and Privacy Policy",
+    label: t("auth.agreeToTerms"),
     type: "checkbox",
     required: true,
   },
-];
+]);
 
 const schema = z
   .object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
+    name: z.string().min(2, t("auth.nameMin2")),
     username: z
       .string()
-      .min(5, "Username must be at least 5 characters")
-      .max(30, "Username must be at most 30 characters")
-      .regex(
-        /^[a-zA-Z0-9_-]+$/,
-        "Username can only contain letters, numbers, underscores, and hyphens",
-      ),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+      .min(5, t("auth.usernameMin5"))
+      .max(30, t("auth.usernameMax30"))
+      .regex(/^[a-zA-Z0-9_-]+$/, t("auth.usernameFormat")),
+    email: z.string().email(t("auth.invalidEmail")),
+    password: z.string().min(8, t("auth.passwordMin8")),
     confirmPassword: z.string(),
-    terms: z.boolean().refine((val) => val === true, "You must agree to the terms"),
+    terms: z.boolean().refine((val) => val === true, t("auth.termsRequired")),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
+    message: t("auth.passwordsDontMatch"),
     path: ["confirmPassword"],
   });
 
@@ -86,26 +84,25 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
     if (error) {
       toast.add({
-        title: "Sign Up Error",
-        description: error.message || "Failed to create account",
+        title: t("auth.signUpError"),
+        description: error.message || t("auth.failedToCreateAccount"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Account Created!",
-      description:
-        "Please check your email and click the verification link to activate your account.",
+      title: t("auth.accountCreated"),
+      description: t("auth.accountCreatedDesc"),
       color: "success",
     });
 
     // Redirect to sign-in page
     await navigateTo("/auth/sign-in");
-  } catch (error) {
+  } catch {
     toast.add({
-      title: "Sign Up Error",
-      description: "An unexpected error occurred",
+      title: t("auth.signUpError"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -119,24 +116,26 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
-        title="Sign Up"
-        description="Create your account to get started"
+        :title="t('auth.signUpTitle')"
+        :description="t('auth.signUpDescription')"
         icon="i-lucide-user-plus"
         :fields="fields"
         :submit="{
-          label: 'Create Account',
+          label: t('auth.createAccount'),
           loading,
           block: true,
         }"
         @submit="onSubmit"
       >
         <template #description>
-          Already have an account?
-          <ULink to="/auth/sign-in" class="text-primary font-medium"> Sign in </ULink>.
+          {{ t("auth.hasAccount") }}
+          <ULink to="/auth/sign-in" class="text-primary font-medium">
+            {{ t("common.signIn") }} </ULink
+          >.
         </template>
 
         <template #password-hint>
-          <p class="text-muted text-sm">Must be at least 8 characters</p>
+          <p class="text-muted text-sm">{{ t("auth.passwordHint") }}</p>
         </template>
 
         <template #validation>
@@ -145,10 +144,14 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
         <template #footer>
           <p class="text-muted text-center text-sm">
-            By creating an account, you agree to our
-            <ULink to="/terms" class="text-primary font-medium"> Terms of Service </ULink>
-            and
-            <ULink to="/privacy" class="text-primary font-medium"> Privacy Policy </ULink>.
+            {{ t("auth.agreePrefix") }}
+            <ULink to="/terms" class="text-primary font-medium">
+              {{ t("auth.termsOfService") }}
+            </ULink>
+            {{ t("common.and") }}
+            <ULink to="/privacy" class="text-primary font-medium">
+              {{ t("auth.privacyPolicy") }} </ULink
+            >.
           </p>
         </template>
       </UAuthForm>

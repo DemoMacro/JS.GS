@@ -3,6 +3,8 @@ import type { Domain } from "~~/shared/types/domain";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 const props = defineProps<{
   domain: Domain | null;
 }>();
@@ -22,8 +24,8 @@ const { copy, copied, isSupported } = useClipboard();
 watch(copied, (isCopied) => {
   if (isCopied) {
     toast.add({
-      title: "Success",
-      description: "Verification token copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.verificationTokenCopied"),
       color: "success",
     });
   }
@@ -32,8 +34,8 @@ watch(copied, (isCopied) => {
 async function copyToken(token: string) {
   if (!isSupported.value) {
     toast.add({
-      title: "Error",
-      description: "Clipboard not supported in this browser",
+      title: t("common.error"),
+      description: t("dashboard.clipboardNotSupported"),
       color: "error",
     });
     return;
@@ -45,8 +47,8 @@ async function copyToken(token: string) {
 async function verifyDomain() {
   if (!props.domain?.id) {
     toast.add({
-      title: "Error",
-      description: "Domain ID is required",
+      title: t("common.error"),
+      description: t("dashboard.domainIdRequired"),
       color: "error",
     });
     return;
@@ -60,16 +62,15 @@ async function verifyDomain() {
 
     if (result.error) {
       toast.add({
-        title: "Verification Failed",
-        description:
-          result.error.message || "Failed to verify domain. Please check your DNS configuration.",
+        title: t("dashboard.verificationFailed"),
+        description: result.error.message || t("dashboard.verificationFailedDesc"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
+      title: t("common.success"),
       description: `Domain ${props.domain.domainName} has been verified successfully!`,
       color: "success",
     });
@@ -78,8 +79,8 @@ async function verifyDomain() {
     open.value = false;
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred during verification",
+      title: t("common.error"),
+      description: t("dashboard.verificationError"),
       color: "error",
     });
   } finally {
@@ -91,8 +92,8 @@ async function verifyDomain() {
 <template>
   <UModal
     v-model:open="open"
-    title="Verify Domain Ownership"
-    description="Verify that you own this domain via DNS TXT record"
+    :title="t('dashboard.verifyDomainOwnership')"
+    :description="t('dashboard.verifyDomainViaDns')"
   >
     <slot />
 
@@ -102,22 +103,22 @@ async function verifyDomain() {
           v-if="domain"
           color="neutral"
           icon="i-lucide-info"
-          title="DNS TXT Record Configuration"
-          description="Add the following TXT record to your domain's DNS configuration:"
+          :title="t('dashboard.dnsTxtConfig')"
+          :description="t('dashboard.addDnsRecord')"
         >
           <template #body>
             <div class="mt-4 space-y-3">
               <div class="flex items-start gap-3">
-                <span class="min-w-16 text-sm font-medium">Type:</span>
+                <span class="min-w-16 text-sm font-medium">{{ t("dashboard.type") }}</span>
                 <UBadge variant="subtle">TXT</UBadge>
               </div>
               <div class="flex items-start gap-3">
-                <span class="min-w-16 text-sm font-medium">Host/Name:</span>
+                <span class="min-w-16 text-sm font-medium">{{ t("dashboard.hostName") }}</span>
                 <span class="font-mono text-sm">@</span>
                 <span class="text-muted-foreground text-xs">(or {{ domain.domainName }})</span>
               </div>
               <div class="flex items-start gap-3">
-                <span class="min-w-16 text-sm font-medium">Value:</span>
+                <span class="min-w-16 text-sm font-medium">{{ t("dashboard.value") }}</span>
                 <div class="flex flex-1 items-center gap-2">
                   <span class="font-mono text-sm break-all">
                     {{ domain.verificationToken }}
@@ -135,12 +136,14 @@ async function verifyDomain() {
         </UAlert>
 
         <div class="flex justify-end gap-2">
-          <UButton variant="outline" @click="open = false" :disabled="loading"> Cancel </UButton>
+          <UButton variant="outline" @click="open = false" :disabled="loading">
+            {{ t("common.cancel") }}
+          </UButton>
           <UButton color="primary" :loading="loading" @click="verifyDomain">
             <template #leading>
               <UIcon name="i-lucide-check" />
             </template>
-            Verify Domain
+            {{ t("dashboard.verifyDomain") }}
           </UButton>
         </div>
       </div>

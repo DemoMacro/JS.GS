@@ -5,13 +5,14 @@ import * as z from "zod";
 import { authClient } from "~/utils/auth";
 
 const toast = useToast();
+const { t } = useI18n();
 
 definePageMeta({
-  title: "Verify Email - JS.GS",
+  layout: "app",
 });
 
 const schema = z.object({
-  email: z.string().email("Invalid email address"),
+  email: z.string().email(t("auth.invalidEmail")),
 });
 
 type Schema = z.output<typeof schema>;
@@ -27,22 +28,22 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
 
     if (error) {
       toast.add({
-        title: "Send Verification Email Error",
-        description: error.message || "Failed to send verification email",
+        title: t("auth.sendVerificationError"),
+        description: error.message || t("auth.failedToSendVerification"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Verification Email Sent",
-      description: "Please check your inbox for the verification link",
+      title: t("auth.verificationSent"),
+      description: t("auth.verificationSentDesc"),
       color: "success",
     });
-  } catch (error) {
+  } catch {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -56,19 +57,19 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
     <UPageCard class="w-full max-w-md">
       <UAuthForm
         :schema="schema"
-        title="Verify Your Email"
-        description="Enter your email address to receive a verification link"
+        :title="t('auth.verifyTitle')"
+        :description="t('auth.verifyDescription')"
         icon="i-lucide-mail"
         :fields="[
           {
             name: 'email',
             type: 'email',
-            label: 'Email',
+            label: t('common.email'),
             required: true,
           },
         ]"
         :submit="{
-          label: 'Send Verification Email',
+          label: t('auth.sendVerification'),
           loading,
           block: true,
         }"
@@ -76,8 +77,10 @@ async function onSubmit(payload: FormSubmitEvent<Schema>) {
       >
         <template #footer>
           <div class="text-muted text-center text-sm">
-            <span>Already verified?</span>
-            <ULink to="/auth/sign-in" class="text-primary font-medium"> Sign In </ULink>
+            <span>{{ t("auth.alreadyVerified") }}</span>
+            <ULink to="/auth/sign-in" class="text-primary font-medium">
+              {{ t("common.signIn") }}
+            </ULink>
           </div>
         </template>
       </UAuthForm>

@@ -5,8 +5,10 @@ import type { Link } from "~~/shared/types/link";
 import { useDomains } from "~/composables/useDomains";
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const items = computed(
@@ -14,7 +16,7 @@ const items = computed(
     [
       [
         {
-          label: "Create Link",
+          label: t("dashboard.createLink"),
           icon: "i-lucide-plus",
           onSelect: () => navigateTo("/dashboard/links/create"),
         },
@@ -46,8 +48,8 @@ watchEffect(async () => {
 watch(copied, (isCopied) => {
   if (isCopied) {
     toast.add({
-      title: "Success",
-      description: "Link copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.linkCopied"),
       color: "success",
     });
   }
@@ -65,8 +67,8 @@ function getLinkDomain(link: Link) {
 async function copyToClipboard(link: Link) {
   if (!isSupported.value) {
     toast.add({
-      title: "Error",
-      description: "Clipboard not supported in this browser",
+      title: t("common.error"),
+      description: t("dashboard.clipboardNotSupported"),
       color: "error",
     });
     return;
@@ -114,8 +116,8 @@ const recentLinks = computed(() => linksData.value?.links ?? []);
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch recent links",
+      title: t("common.error"),
+      description: t("dashboard.failedToFetchLinks"),
       color: "error",
     });
   }
@@ -125,7 +127,7 @@ watch(error, (newError) => {
 <template>
   <UDashboardPanel id="dashboard-index">
     <template #header>
-      <UDashboardNavbar title="Dashboard" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar :title="t('dashboard.title')" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -141,19 +143,19 @@ watch(error, (newError) => {
     <template #body>
       <UPageCard>
         <template #header>
-          <h3 class="text-lg font-semibold">Quick Actions</h3>
-          <p class="text-muted-foreground text-sm">Common link management tasks</p>
+          <h3 class="text-lg font-semibold">{{ t("dashboard.quickActions") }}</h3>
+          <p class="text-muted-foreground text-sm">{{ t("dashboard.commonTasks") }}</p>
         </template>
 
         <UPageGrid class="gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <UButton to="/dashboard/links/create" variant="outline" class="justify-start">
             <UIcon name="i-lucide-plus" class="mr-2" />
-            Create Link
+            {{ t("dashboard.createLink") }}
           </UButton>
 
           <UButton to="/dashboard/settings" variant="outline" class="justify-start">
             <UIcon name="i-lucide-settings" class="mr-2" />
-            Settings
+            {{ t("dashboard.settings") }}
           </UButton>
         </UPageGrid>
       </UPageCard>
@@ -162,8 +164,8 @@ watch(error, (newError) => {
         <template #header>
           <div class="flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-semibold">Recent Links</h3>
-              <p class="text-muted-foreground text-sm">Your most recently created links</p>
+              <h3 class="text-lg font-semibold">{{ t("dashboard.recentLinks") }}</h3>
+              <p class="text-muted-foreground text-sm">{{ t("dashboard.recentLinksDesc") }}</p>
             </div>
             <UButton
               to="/dashboard/links"
@@ -171,20 +173,20 @@ watch(error, (newError) => {
               size="sm"
               trailing-icon="i-lucide-arrow-right"
             >
-              View All
+              {{ t("common.viewAll") }}
             </UButton>
           </div>
         </template>
 
         <div v-if="loading" class="py-8 text-center">
           <UIcon name="i-lucide-loader-2" class="mx-auto mb-4 size-8 animate-spin" />
-          <p class="text-muted-foreground">Loading links...</p>
+          <p class="text-muted-foreground">{{ t("dashboard.loadingLinks") }}</p>
         </div>
 
         <div v-else-if="recentLinks.length === 0" class="text-muted-foreground py-8 text-center">
           <UIcon name="i-lucide-link" class="mx-auto mb-4 size-12 opacity-50" />
-          <p>No links yet.</p>
-          <p class="text-sm">Create your first short link to get started!</p>
+          <p>{{ t("dashboard.noLinks") }}</p>
+          <p class="text-sm">{{ t("dashboard.noLinksDesc") }}</p>
         </div>
 
         <div v-else>
@@ -214,14 +216,14 @@ watch(error, (newError) => {
                   variant="ghost"
                   size="sm"
                   icon="i-lucide-eye"
-                  title="View Details"
+                  :title="t('common.viewDetails')"
                 />
 
                 <UButton
                   variant="ghost"
                   size="sm"
                   icon="i-lucide-copy"
-                  title="Copy Link"
+                  :title="t('dashboard.copyLink')"
                   @click="copyToClipboard(link)"
                 />
 
@@ -231,7 +233,7 @@ watch(error, (newError) => {
                     size="sm"
                     icon="i-lucide-trash"
                     color="error"
-                    title="Delete Link"
+                    :title="t('dashboard.deleteLink')"
                   />
                 </DashboardLinkDeleteModal>
               </div>

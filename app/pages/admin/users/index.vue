@@ -5,8 +5,10 @@ import type { UserWithRole } from "better-auth/plugins";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Users - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 // Table state
@@ -63,8 +65,8 @@ const total = computed(() => usersData.value?.total ?? 0);
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch users",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   }
@@ -79,50 +81,50 @@ watch(
 );
 
 // Table columns
-const columns: TableColumn<UserWithRole>[] = [
+const columns = computed<TableColumn<UserWithRole>[]>(() => [
   {
     accessorKey: "email",
-    header: "Email",
+    header: t("common.email"),
   },
   {
     accessorKey: "name",
-    header: "Name",
+    header: t("common.name"),
   },
   {
     accessorKey: "image",
-    header: "Avatar",
+    header: t("admin.avatar"),
   },
   {
     accessorKey: "emailVerified",
-    header: "Verified",
+    header: t("common.verified"),
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: t("common.role"),
   },
   {
     accessorKey: "banned",
-    header: "Status",
+    header: t("common.status"),
   },
   {
     accessorKey: "createdAt",
-    header: "Created",
+    header: t("common.created"),
   },
   {
     accessorKey: "updatedAt",
-    header: "Updated",
+    header: t("common.updated"),
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: t("common.actions"),
   },
-];
+]);
 </script>
 
 <template>
   <UDashboardPanel id="users">
     <template #header>
-      <UDashboardNavbar title="Users">
+      <UDashboardNavbar :title="t('admin.users')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -137,12 +139,12 @@ const columns: TableColumn<UserWithRole>[] = [
             :model-value="table?.tableApi?.getColumn('email')?.getFilterValue() as string"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Filter emails..."
+            :placeholder="t('admin.filterEmails')"
             @update:model-value="table?.tableApi?.getColumn('email')?.setFilterValue($event)"
           />
 
           <div class="flex flex-wrap items-center gap-2">
-            <UButton to="/admin/users/create" label="Add User">
+            <UButton :to="`/admin/users/create`" :label="t('admin.addUser')">
               <template #leading>
                 <UIcon name="i-lucide-plus" />
               </template>
@@ -151,10 +153,10 @@ const columns: TableColumn<UserWithRole>[] = [
             <USelect
               v-model="pagination.pageSize"
               :items="[
-                { label: '10 per page', value: 10 },
-                { label: '25 per page', value: 25 },
-                { label: '50 per page', value: 50 },
-                { label: '100 per page', value: 100 },
+                { label: t('dashboard.perPage', { count: 10 }), value: 10 },
+                { label: t('dashboard.perPage', { count: 25 }), value: 25 },
+                { label: t('dashboard.perPage', { count: 50 }), value: 50 },
+                { label: t('dashboard.perPage', { count: 100 }), value: 100 },
               ]"
               class="min-w-32"
             />
@@ -212,7 +214,7 @@ const columns: TableColumn<UserWithRole>[] = [
                 variant="soft"
                 size="sm"
               >
-                {{ row.getValue("emailVerified") ? "Verified" : "Not Verified" }}
+                {{ row.getValue("emailVerified") ? t("common.verified") : t("common.notVerified") }}
               </UBadge>
             </template>
 
@@ -221,13 +223,13 @@ const columns: TableColumn<UserWithRole>[] = [
                 :color="row.getValue('role') === 'admin' ? 'primary' : 'neutral'"
                 variant="soft"
               >
-                {{ row.getValue("role") || "user" }}
+                {{ row.getValue("role") || t("common.user") }}
               </UBadge>
             </template>
 
             <template #banned-cell="{ row }">
               <div v-if="row.getValue('banned')" class="space-y-1">
-                <UBadge color="error" variant="soft" size="sm"> Banned </UBadge>
+                <UBadge color="error" variant="soft" size="sm"> {{ t("common.banned") }} </UBadge>
                 <div v-if="row.getValue('banReason')" class="text-muted-foreground text-xs">
                   {{ row.getValue("banReason") }}
                 </div>
@@ -236,7 +238,9 @@ const columns: TableColumn<UserWithRole>[] = [
                   {{ new Date(row.getValue("banExpires")).toLocaleDateString() }}
                 </div>
               </div>
-              <UBadge v-else color="success" variant="soft" size="sm"> Active </UBadge>
+              <UBadge v-else color="success" variant="soft" size="sm">
+                {{ t("common.active") }}
+              </UBadge>
             </template>
 
             <template #createdAt-cell="{ row }">
@@ -258,7 +262,7 @@ const columns: TableColumn<UserWithRole>[] = [
                   :to="`/admin/users/${row.original.id}`"
                   variant="ghost"
                   icon="i-lucide-eye"
-                  title="View Details"
+                  :title="t('common.viewDetails')"
                 />
 
                 <!-- Security Settings -->
@@ -266,7 +270,7 @@ const columns: TableColumn<UserWithRole>[] = [
                   :to="`/admin/users/${row.original.id}/security`"
                   variant="ghost"
                   icon="i-lucide-shield"
-                  title="Security Settings"
+                  :title="t('admin.securitySettings')"
                 />
 
                 <!-- Delete (Keep as Modal for dangerous action) -->
@@ -275,7 +279,7 @@ const columns: TableColumn<UserWithRole>[] = [
                     variant="ghost"
                     icon="i-lucide-trash"
                     color="error"
-                    title="Delete User"
+                    :title="t('admin.deleteUser')"
                   />
                 </DashboardUserDeleteModal>
               </div>

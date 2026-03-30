@@ -4,23 +4,22 @@ import * as z from "zod";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Create Organization - Admin - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
 
 // Form schema
 const schema = z.object({
-  name: z.string().min(1, "Organization name is required"),
+  name: z.string().min(1, t("admin.orgNameRequired")),
   slug: z
     .string()
-    .min(4, "Slug is required")
-    .regex(
-      /^[a-z0-9_-]+$/,
-      "Slug must contain only lowercase letters, numbers, hyphens, and underscores",
-    ),
-  logo: z.string().url("Invalid URL").optional().or(z.literal("")),
+    .min(4, t("admin.orgSlugRequired"))
+    .regex(/^[a-z0-9_-]+$/, t("admin.orgSlugFormat")),
+  logo: z.string().url(t("admin.invalidUrl")).optional().or(z.literal("")),
 });
 
 type Schema = z.output<typeof schema>;
@@ -85,16 +84,16 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
-        description: result.error.message || "Failed to create organization",
+        title: t("common.error"),
+        description: result.error.message || t("admin.failedToCreateOrg"),
         color: "error",
       });
       return;
     }
 
     toast.add({
-      title: "Success",
-      description: `Organization "${event.data.name}" has been created successfully`,
+      title: t("common.success"),
+      description: t("admin.orgCreated", { name: event.data.name }),
       color: "success",
     });
 
@@ -105,8 +104,8 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
     await navigateTo("/admin/orgs");
   } catch (error) {
     toast.add({
-      title: "Error",
-      description: "An unexpected error occurred while creating organization",
+      title: t("common.error"),
+      description: t("common.unexpectedError"),
       color: "error",
     });
   } finally {
@@ -118,7 +117,7 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
 <template>
   <UDashboardPanel id="create-organization">
     <template #header>
-      <UDashboardNavbar title="Create Organization">
+      <UDashboardNavbar :title="t('admin.createOrganization')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -134,17 +133,19 @@ async function createOrganization(event: FormSubmitEvent<Schema>) {
           @submit="createOrganization"
         >
           <UPageCard
-            title="Create Organization"
-            description="Create a new organization for managing teams and resources."
+            :title="t('admin.createOrganization')"
+            :description="t('admin.createOrgDesc')"
             variant="naked"
             orientation="horizontal"
             class="mb-4"
           >
             <div class="ms-auto flex gap-3">
-              <UButton variant="outline" to="/admin/orgs" :disabled="submitting"> Cancel </UButton>
+              <UButton variant="outline" to="/admin/orgs" :disabled="submitting">
+                {{ t("common.cancel") }}
+              </UButton>
               <UButton
                 form="create-organization"
-                label="Create Organization"
+                :label="t('admin.createOrganization')"
                 color="primary"
                 type="submit"
                 :loading="submitting"

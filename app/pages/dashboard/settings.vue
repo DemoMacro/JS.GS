@@ -1,37 +1,39 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from "@nuxt/ui";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Settings - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 // Navigation items
-const links = [
+const links = computed<NavigationMenuItem[][]>(() => [
   [
     {
-      label: "Profile",
+      label: t("dashboard.profile"),
       icon: "i-lucide-user",
       to: "/dashboard/settings",
       exact: true,
     },
     {
-      label: "Security",
+      label: t("dashboard.security"),
       icon: "i-lucide-shield",
       to: "/dashboard/settings/security",
     },
     {
-      label: "Invitations",
+      label: t("dashboard.invitations"),
       icon: "i-lucide-mail",
       to: "/dashboard/settings/invitations",
     },
   ],
-] satisfies NavigationMenuItem[][];
+]);
 </script>
 
 <template>
   <UDashboardPanel id="user-settings" :ui="{ body: 'lg:py-12' }">
     <template #header>
-      <UDashboardNavbar title="Settings">
+      <UDashboardNavbar :title="t('common.settings')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>

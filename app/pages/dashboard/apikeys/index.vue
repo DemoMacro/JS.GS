@@ -4,8 +4,10 @@ import { getPaginationRowModel } from "@tanstack/table-core";
 
 import { authClient } from "~/utils/auth";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "API Keys - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const toast = useToast();
@@ -57,8 +59,8 @@ const total = computed(() => apiKeysData.value?.total ?? 0);
 watch(error, (newError) => {
   if (newError) {
     toast.add({
-      title: "Error",
-      description: "Failed to fetch API keys",
+      title: t("common.error"),
+      description: t("dashboard.failedToFetchApiKeys"),
       color: "error",
     });
   }
@@ -68,8 +70,8 @@ watch(error, (newError) => {
 watch(copied, (isCopied) => {
   if (isCopied) {
     toast.add({
-      title: "Success",
-      description: "API Key copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.apiKeyCopied"),
       color: "success",
     });
   }
@@ -77,9 +79,7 @@ watch(copied, (isCopied) => {
 
 // Delete API key
 async function deleteApiKey(keyId: string, keyName: string) {
-  const confirmed = confirm(
-    `Are you sure you want to delete API key "${keyName}"? This action cannot be undone.`,
-  );
+  const confirmed = confirm(t("dashboard.deleteApiKeyConfirm", { name: keyName }));
   if (!confirmed) return;
 
   try {
@@ -89,7 +89,7 @@ async function deleteApiKey(keyId: string, keyName: string) {
 
     if (result.error) {
       toast.add({
-        title: "Error",
+        title: t("common.error"),
         description: result.error.message || "Failed to delete API key",
         color: "error",
       });
@@ -97,8 +97,8 @@ async function deleteApiKey(keyId: string, keyName: string) {
     }
 
     toast.add({
-      title: "Success",
-      description: `API Key "${keyName}" has been deleted successfully`,
+      title: t("common.success"),
+      description: t("dashboard.apiKeyDeleted", { name: keyName }),
       color: "success",
     });
 
@@ -106,7 +106,7 @@ async function deleteApiKey(keyId: string, keyName: string) {
     await fetchApiKeys();
   } catch (error) {
     toast.add({
-      title: "Error",
+      title: t("common.error"),
       description: error instanceof Error ? error.message : "Failed to delete API key",
       color: "error",
     });
@@ -134,35 +134,43 @@ function isExpired(expiresAt: number | null): boolean {
 const columns: TableColumn<any>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: () => t("common.name"),
   },
   {
     accessorKey: "enabled",
-    header: "Status",
+    header: () => t("common.status"),
   },
   {
     accessorKey: "expiresAt",
-    header: "Expires",
+    header: () => t("common.expires"),
   },
   {
     accessorKey: "lastUsed",
-    header: "Last Used",
+    header: () => t("common.lastUsed"),
   },
   {
     accessorKey: "createdAt",
-    header: "Created",
+    header: () => t("common.created"),
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: () => t("common.actions"),
   },
 ];
+
+// Pagination items
+const paginationItems = computed(() => [
+  { label: t("dashboard.perPage", { count: 10 }), value: 10 },
+  { label: t("dashboard.perPage", { count: 25 }), value: 25 },
+  { label: t("dashboard.perPage", { count: 50 }), value: 50 },
+  { label: t("dashboard.perPage", { count: 100 }), value: 100 },
+]);
 </script>
 
 <template>
   <UDashboardPanel id="api-keys">
     <template #header>
-      <UDashboardNavbar title="API Keys">
+      <UDashboardNavbar :title="t('dashboard.apiKeys')">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -177,26 +185,17 @@ const columns: TableColumn<any>[] = [
             v-model="globalFilter"
             class="max-w-sm"
             icon="i-lucide-search"
-            placeholder="Search by name..."
+            :placeholder="t('dashboard.searchApiKey')"
           />
 
           <div class="flex flex-wrap items-center gap-2">
-            <UButton to="/dashboard/apikeys/create" label="Create API Key">
+            <UButton to="/dashboard/apikeys/create" :label="t('dashboard.createApiKey')">
               <template #leading>
                 <UIcon name="i-lucide-plus" />
               </template>
             </UButton>
 
-            <USelect
-              v-model="pagination.pageSize"
-              :items="[
-                { label: '10 per page', value: 10 },
-                { label: '25 per page', value: 25 },
-                { label: '50 per page', value: 50 },
-                { label: '100 per page', value: 100 },
-              ]"
-              class="min-w-32"
-            />
+            <USelect v-model="pagination.pageSize" :items="paginationItems" class="min-w-32" />
           </div>
         </div>
 
@@ -228,16 +227,16 @@ const columns: TableColumn<any>[] = [
 
             <template #enabled-cell="{ row }">
               <UBadge :color="row.getValue('enabled') ? 'success' : 'neutral'" variant="subtle">
-                {{ row.getValue("enabled") ? "Active" : "Disabled" }}
+                {{ row.getValue("enabled") ? t("common.active") : t("common.disabled") }}
               </UBadge>
             </template>
 
             <template #expiresAt-cell="{ row }">
               <UBadge v-if="!row.original.expiresAt" color="neutral" variant="subtle">
-                Never
+                {{ t("common.never") }}
               </UBadge>
               <UBadge v-else-if="isExpired(row.original.expiresAt)" color="error" variant="subtle">
-                Expired
+                {{ t("common.expired") }}
               </UBadge>
               <UBadge v-else color="success" variant="subtle">
                 {{ formatDate(row.original.expiresAt) }}
@@ -246,7 +245,7 @@ const columns: TableColumn<any>[] = [
 
             <template #lastUsed-cell="{ row }">
               <span v-if="!row.original.lastUsed" class="text-muted-foreground text-sm">
-                Never
+                {{ t("common.never") }}
               </span>
               <span v-else class="text-sm">
                 {{ formatDate(row.original.lastUsed) }}
@@ -266,7 +265,7 @@ const columns: TableColumn<any>[] = [
                   icon="i-lucide-trash"
                   color="error"
                   size="sm"
-                  title="Delete API Key"
+                  :title="t('dashboard.deleteApiKey')"
                   @click="deleteApiKey(row.original.id, row.getValue('name'))"
                 />
               </div>
@@ -275,11 +274,11 @@ const columns: TableColumn<any>[] = [
             <template #empty>
               <div class="flex flex-col items-center justify-center py-12 text-center">
                 <UIcon name="i-lucide-key" class="text-muted-foreground mb-4 size-12" />
-                <h3 class="mb-2 text-lg font-semibold">No API Keys yet</h3>
+                <h3 class="mb-2 text-lg font-semibold">{{ t("dashboard.noApiKeys") }}</h3>
                 <p class="text-muted-foreground mb-4 max-w-md">
-                  Create an API key to enable programmatic access to your account.
+                  {{ t("dashboard.noApiKeysDesc") }}
                 </p>
-                <UButton to="/dashboard/apikeys/create" label="Create your first API Key" />
+                <UButton to="/dashboard/apikeys/create" :label="t('dashboard.createFirstApiKey')" />
               </div>
             </template>
           </UTable>
@@ -304,13 +303,11 @@ const columns: TableColumn<any>[] = [
 
         <!-- Info Section -->
         <div class="border-default border-t pt-4">
-          <UAlert icon="i-lucide-info" color="neutral" title="How to use API Keys">
+          <UAlert icon="i-lucide-info" color="neutral" :title="t('dashboard.apiKeyUsage')">
             <template #description>
-              <span class="inline"
-                >Include your API key in the 'x-api-key' header when making requests.
-              </span>
+              <span class="inline">{{ t("dashboard.apiKeyUsageDesc") }}</span>
               <NuxtLink to="/api/reference" target="_blank" class="inline hover:underline">
-                View API Documentation →
+                {{ t("dashboard.viewApiDocs") }}
               </NuxtLink>
             </template>
           </UAlert>

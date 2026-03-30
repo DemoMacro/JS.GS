@@ -4,6 +4,7 @@ definePageMeta({
 });
 
 const toast = useToast();
+const { t } = useI18n();
 
 // Get active organization
 const activeOrgResult = authClient.useActiveOrganization();
@@ -84,14 +85,14 @@ async function handleRemove(memberId: string) {
   <div class="space-y-6">
     <!-- Invite Members Card -->
     <UPageCard
-      title="Invite Members"
-      description="Invite new members by email address."
+      :title="t('common.inviteMembers')"
+      :description="t('common.inviteMembersDesc')"
       variant="naked"
       orientation="horizontal"
       class="mb-4"
     >
       <DashboardOrgMemberAddModal :organization="activeOrg">
-        <UButton label="Invite people" color="neutral" class="w-fit lg:ms-auto">
+        <UButton :label="t('common.invitePeople')" color="neutral" class="w-fit lg:ms-auto">
           <template #leading>
             <UIcon name="i-lucide-user-plus" />
           </template>
@@ -112,7 +113,7 @@ async function handleRemove(memberId: string) {
         <UInput
           v-model="searchValue"
           icon="i-lucide-search"
-          placeholder="Search members"
+          :placeholder="t('common.searchMembers')"
           class="w-full"
         />
       </template>

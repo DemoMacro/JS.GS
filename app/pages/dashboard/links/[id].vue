@@ -3,8 +3,10 @@ import type { NavigationMenuItem } from "@nuxt/ui";
 
 import { useDomains } from "~/composables/useDomains";
 
+const { t } = useI18n();
+
 definePageMeta({
-  title: "Link Details - Dashboard - JS.GS",
+  layout: "dashboard",
 });
 
 const route = useRoute();
@@ -31,8 +33,8 @@ function getLinkDomain() {
 watch(copied, (isCopied) => {
   if (isCopied) {
     toast.add({
-      title: "Success",
-      description: "Link copied to clipboard",
+      title: t("common.success"),
+      description: t("dashboard.linkCopied"),
       color: "success",
     });
   }
@@ -45,8 +47,8 @@ async function copyToClipboard() {
 
   if (!isSupported.value) {
     toast.add({
-      title: "Error",
-      description: "Clipboard not supported in this browser",
+      title: t("common.error"),
+      description: t("dashboard.clipboardNotSupported"),
       color: "error",
     });
     return;
@@ -63,18 +65,18 @@ const { range } = useLinkAnalytics(linkId);
 const links = computed<NavigationMenuItem[][]>(() => [
   [
     {
-      label: "Overview",
+      label: t("dashboard.overview"),
       icon: "i-lucide-link",
       to: `/dashboard/links/${linkId}`,
       exact: true,
     },
     {
-      label: "Events",
+      label: t("common.events"),
       icon: "i-lucide-list",
       to: `/dashboard/links/${linkId}/events`,
     },
     {
-      label: "Edit",
+      label: t("common.edit"),
       icon: "i-lucide-edit",
       to: `/dashboard/links/${linkId}/edit`,
     },
@@ -85,7 +87,9 @@ const links = computed<NavigationMenuItem[][]>(() => [
 <template>
   <UDashboardPanel id="link-details">
     <template #header>
-      <UDashboardNavbar :title="`Link - ${link?.shortCode || 'Unknown'}`">
+      <UDashboardNavbar
+        :title="t('dashboard.linkTitle', { shortCode: link?.shortCode || t('common.unknown') })"
+      >
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -96,7 +100,7 @@ const links = computed<NavigationMenuItem[][]>(() => [
               icon="i-lucide-copy"
               color="neutral"
               variant="ghost"
-              title="Copy Link"
+              :title="t('dashboard.copyLink')"
               @click="copyToClipboard"
             />
 
@@ -105,7 +109,7 @@ const links = computed<NavigationMenuItem[][]>(() => [
                 icon="i-lucide-qr-code"
                 color="neutral"
                 variant="ghost"
-                title="Show QR Code"
+                :title="t('dashboard.showQrCode')"
               />
 
               <template #content>
@@ -139,11 +143,13 @@ const links = computed<NavigationMenuItem[][]>(() => [
       </div>
 
       <div v-else-if="!link" class="py-8 text-center">
-        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">Link not found</h3>
+        <h3 class="text-muted-foreground mb-2 text-lg font-semibold">
+          {{ t("dashboard.linkNotFound") }}
+        </h3>
         <p class="text-muted-foreground mb-4">
-          The link you're looking for doesn't exist or you don't have permission to view it.
+          {{ t("dashboard.linkNotFoundDesc") }}
         </p>
-        <UButton to="/dashboard/links">Back to Links</UButton>
+        <UButton to="/dashboard/links">{{ t("dashboard.backToLinks") }}</UButton>
       </div>
 
       <div v-else class="mx-auto flex h-full w-full flex-col gap-4 sm:gap-6 lg:gap-12">

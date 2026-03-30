@@ -8,7 +8,9 @@ export default defineConfig({
     },
   },
   fmt: {
-    sortImports: {},
+    sortImports: {
+      type: "natural",
+    },
     sortPackageJson: true,
     sortTailwindcss: {},
   },

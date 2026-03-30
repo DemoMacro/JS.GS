@@ -1,11 +1,9 @@
 <script setup lang="ts">
+const { t, locale } = useI18n();
+
 definePageMeta({
   layout: "app",
-  title: "Privacy Policy - JS.GS",
-  description: "Learn how JS.GS collects, uses, and protects your personal information.",
 });
-
-const { locale } = useI18n();
 
 // Fetch all data from the collection
 const { data: privacy } = await useAsyncData("privacy", () => {
@@ -29,13 +27,13 @@ if (privacy.value) {
       <!-- Header -->
       <div class="mb-8 text-center">
         <h1 class="mb-4 text-4xl font-bold">
-          {{ privacy?.title || "Privacy Policy" }}
+          {{ privacy?.title || t("privacy.title") }}
         </h1>
         <p class="text-lg">
           {{ privacy?.description }}
         </p>
         <p v-if="privacy?.meta.date" class="mt-2 text-sm opacity-75">
-          Last updated: {{ privacy.meta.date }}
+          {{ t("common.lastUpdated") }} {{ privacy.meta.date }}
         </p>
       </div>
 
